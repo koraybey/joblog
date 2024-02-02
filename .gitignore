@@ -1,0 +1,6 @@
+target
+.env
+model/
+__pycache__
+config.yaml
+.DS_Store

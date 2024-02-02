@@ -1,0 +1,12 @@
+{
+  "name": "Source Code Extractor",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Extracts and stringifies site's source code",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["http://localhost/*"],
+  "action": {},
+  "background": {
+    "service_worker": "background.js"
+  }
+}

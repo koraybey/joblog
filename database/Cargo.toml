@@ -1,0 +1,23 @@
+[package]
+name = "joblog"
+version = "0.1.0"
+authors = ["lucperkins <lucperkins@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+actix-rt = "1.0.0"
+actix-web = "2.0.0"
+diesel = { version = "1.4.3", features = ["postgres", "r2d2"] }
+dotenv = "0.15.0"
+env_logger = "0.7.1"
+juniper = "0.14.2"
+r2d2 = "0.8.8"
+serde_json = "1.0.44"
+
+[dependencies.uuid]
+version = "1.7.0"
+features = [
+    "v4",                # Lets you generate random UUIDs
+    "fast-rng",          # Use a faster (but still sufficiently random) RNG
+    "macro-diagnostics", # Enable better diagnostics for compile-time UUIDs
+]

@@ -1,0 +1,17 @@
+flask
+flask_cors
+beautifulsoup4
+gql
+llama-index
+pyyaml
+mistralai
+pydantic
+SQLAlchemy
+psycopg2
+tiktoken
+# Textract comes with bunch of other dependencies. Make sure they are installed.
+# https://textract.readthedocs.io/en/stable/installation.html
+textract
+# Use following documentation if you are on Mac and enable Metal support.
+# https://llama-cpp-python.readthedocs.io/en/latest/install/macos/
+llama-cpp-python

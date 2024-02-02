@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "responsibility": {
+            "description": "Original fact from candidate's professional experience.",
+            "type": "string"
+        },
+        "relevancy": {
+            "description": "Explain why the fact is relevant or irrelevant for the job.",
+            "type": "boolean"
+        },
+        "relevancy_explanation": {
+            "description": "Explain why the fact is relevant or irrelevant for the job.",
+            "type": "string"
+        },
+        "suggestions": {
+            "description": "Improvement suggestion to match the fact to the job description.",
+            "type": [
+                "string",
+                "null"
+            ]
+        },
+        "improved_fact": {
+            "description": "Rewritten fact to match the job responsibilities and writing style. Leave null if the fact is irrelevant.",
+            "type": [
+                "string",
+                "null"
+            ]
+        }
+    },
+    "required": [
+        "responsibility",
+        "relevancy",
+        "relevancy_explanation"
+    ]
+}
