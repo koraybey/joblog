@@ -1,6 +1,10 @@
-#!/usr/bin/env python3
 import json
 import re
+import sys
+
+import textract
+from bs4 import BeautifulSoup
+from jsonref import replace_refs
 
 # whitespace is constrained to a single space char to prevent model "running away" in
 # whitespace. Also maybe improves generation quality?
@@ -110,9 +114,32 @@ class SchemaConverter:
         return "\n".join((f"{name} ::= {rule}" for name, rule in self._rules.items()))
 
 
-def schema2grammar(json, prop_order):
+def json_schema_to_grammar(json, prop_order) -> str:
     prop_order = {name: idx for idx, name in enumerate(prop_order)}
     converter = SchemaConverter(prop_order)
     converter.visit(json, "")
     print(converter.format_grammar())
     return converter.format_grammar()
+
+
+def json_schema_with_inlining(model):
+    replaced = replace_refs(model.model_json_schema(), proxies=False)
+    if "$defs" in replaced:  # type: ignore
+        del replaced["$defs"]  # type: ignore
+    return replaced
+
+
+def scrape_job_posting(html: str):
+    soup = BeautifulSoup(html["html"], "html.parser")
+    for s in soup.select("form"):
+        s.extract()
+    text = soup.get_text()
+    return text
+
+
+def extract_text_from_pdf(file):
+    try:
+        return textract.process(file)
+    except Exception as e:
+        print("Error processing file: ", str(e))
+        sys.exit(1)

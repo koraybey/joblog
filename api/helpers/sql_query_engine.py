@@ -1,18 +1,26 @@
 import yaml
-
+from huggingface_hub import hf_hub_download
+from llama_cpp import Llama
+from llama_index import SQLDatabase
 from llama_index.indices.struct_store.sql_query import NLSQLTableQueryEngine
-from llama_index import SQLDatabase, ServiceContext
-from llama_index.llms import OpenAI
 from sqlalchemy import create_engine
 
-with open("config.yaml", "r") as file:
+with open("../config.yaml", "r") as file:
     config = yaml.safe_load(file)
 
 engine = create_engine("postgresql+psycopg2://koraybey@localhost:5432/joblog")
-OpenAI.api_key = OpenAI.api_key = f"model/{config['openai']['api_key']}"
 
-llm = OpenAI(model="gpt-4-1106-preview", temperature=0.1)
-service_context = ServiceContext.from_defaults(llm=llm)
+model_path = hf_hub_download(
+    repo_id=config["local"]["repo_id"],
+    filename=config["local"]["model"],
+)
+
+llm = Llama(
+    model_path=model_path,
+    n_ctx=config["local"]["n_ctx"],
+    n_gpu_layers=-1,
+)
+
 sql_database = SQLDatabase(engine, include_tables=["vacancies"])
 
 query_engine = NLSQLTableQueryEngine(

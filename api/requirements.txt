@@ -1,14 +1,17 @@
 flask
 flask_cors
 beautifulsoup4
+huggingface-hub
 gql
 llama-index
 pyyaml
-mistralai
 pydantic
 SQLAlchemy
-psycopg2
+psycopg2-binary
 tiktoken
+outlines
+lmql
+jsonref
 # Textract comes with bunch of other dependencies. Make sure they are installed.
 # https://textract.readthedocs.io/en/stable/installation.html
 textract

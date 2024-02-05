@@ -3,7 +3,7 @@ chrome.action.onClicked.addListener((tab) => {
     target: { tabId: tab.id },
     function: function () {
       const body = document.querySelector("body").innerHTML;
-      fetch("http://localhost:5000/html2text", {
+      fetch("https://h29opgs89s45oj-5000.proxy.runpod.net/createVacancy", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

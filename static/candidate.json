@@ -1,14 +1,14 @@
 {
-  "name": "Koray E.",
-  "location": "Berlin, Germany",
-  "experience": [
+  "candidate_name": "Koray E.",
+  "candidate_location": "Berlin, Germany",
+  "candidate_experience": [
     {
-      "company": "MEMBER",
-      "role": "Chief Product Officer (Technical)",
-      "dateStart": "2021-10-01",
-      "dateEnd": null,
-      "about": "MEMBER is a community platform that facilitates anonymous media exchange and chat. In the ongoing soft launch phase, development efforts are concentrated on the integration of third-party tools, such as LLM agents and blockchain marketplaces, to augment knowledge and value exchange within these communities.",
-      "responsibilities": [
+      "candidate_company_name": "MEMBER",
+      "candidate_role": "Chief Product Officer (Technical)",
+      "candidate_role_date_start": "2021-10-01",
+      "candidate_role_date_end": null,
+      "candidate_role_description": "MEMBER is a community platform that facilitates anonymous media exchange and chat. In the ongoing soft launch phase, development efforts are concentrated on the integration of third-party tools, such as LLM agents and blockchain marketplaces, to augment knowledge and value exchange within these communities.",
+      "candidate_role_responsibilities": [
         "Led the formation and management of cross-functional product and engineering teams, overseeing 17 members, to successfully transform a conceptual idea into a production-ready React Native social media application.",
         "Worked as line cook at a local french restaurant.",
         "Maintained a pristine quality garden for Queen Elizabeth and led her botanic exhibits with success.",
@@ -20,12 +20,12 @@
       ]
     },
     {
-      "company": "brandTURBO",
-      "role": "Head of Product (Technical)",
-      "dateStart": "2021-10-01",
-      "dateEnd": "2020-05-01",
-      "about": "brandTURBO develops and manages numerous React-based Chrome homepage extensions for renowned brands, including Galatasaray, AC Milan, Red Bull, Manchester City, Aston Villa, and Universal Music.",
-      "responsibilities": [
+      "candidate_company_name": "brandTURBO",
+      "candidate_role": "Head of Product (Technical)",
+      "candidate_role_date_start": "2021-10-01",
+      "candidate_role_date_end": "2020-05-01",
+      "candidate_role_description": "brandTURBO develops and manages numerous React-based Chrome homepage extensions for renowned brands, including Galatasaray, AC Milan, Red Bull, Manchester City, Aston Villa, and Universal Music.",
+      "candidate_role_responsibilities": [
         "Supervised the development, repository maintenance, and management of over a hundred React-based Chrome homepage extensions for prestigious brands, including Fenerbahçe, Galatasaray, AC Milan, Red Bull, Manchester City, Aston Villa, and Universal Music.",
         "Owned the strategic planning and execution of product launches and marketing initiatives, acquiring 270,000 new users with 70% click-to-install rate, generating 160 million additional impressions and increasing unique daily active user count to 70,000 across all extensions.",
         "Built third-party integrations for client websites, capturing their web traffic and redirecting it to extension storefronts, resulting in 120,000 clicks and the acquisition of additional 55,000 users.",
@@ -33,23 +33,23 @@
       ]
     }
   ],
-  "education": [
+  "candidate_education": [
     {
-      "institution": "Università di Bologna",
-      "degree": "Business and Economics",
-      "dateStart": " 2014-09-01",
-      "dateEnd": "2016-09-01",
-      "about": null
+      "candidate_education_institution_name": "Università di Bologna",
+      "candidate_education_degree_name": "Business and Economics",
+      "candidate_education_date_start": " 2014-09-01",
+      "candidate_education_date_end": "2016-09-01",
+      "candidate_education_about": null
     }
   ],
-  "preferences": [
+  "candidate_preferences": [
     {
-      "location": "Berlin, Germany",
-      "contract": "Full-time",
-      "remote": "Remote",
-      "salaryLow": "90000",
-      "salaryHigh": "135000",
-      "salaryCurrency": "EUR"
+      "candidate_location_preference": "Berlin, Germany",
+      "candidate_contract_type_preference": "Full-time",
+      "candidate_remote_work_preference": "Remote",
+      "candidate_salary_min_preference": "90000",
+      "candidate_salary_max_preference": "135000",
+      "candidate_salary_currency_preference": "EUR"
     }
   ]
 }

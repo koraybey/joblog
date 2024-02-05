@@ -1,6 +1,7 @@
 target
 .env
-model/
+uploads
 __pycache__
 config.yaml
+secrets.yaml
 .DS_Store
