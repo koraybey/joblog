@@ -1,6 +1,6 @@
 use super::context::GraphQLContext;
 use diesel::pg::PgConnection;
-use juniper::{FieldResult, RootNode};
+use juniper::{graphql_object, EmptySubscription, FieldResult};
 
 use super::data::Vacancies;
 use super::models::{Vacancy, VacancyInput};
@@ -10,14 +10,16 @@ pub struct Query;
 
 // The root Query struct relies on GraphQLContext to provide the connection pool
 // needed to execute actual Postgres queries.
-#[juniper::object(Context = GraphQLContext)]
+#[graphql_object(Context = GraphQLContext)]
 impl Query {
+    #[graphql(name = "allVacancies")]
     pub fn all_vacancies(context: &GraphQLContext) -> FieldResult<Vec<Vacancy>> {
         // TODO: pass the GraphQLContext into the querying functions rather
         // than a PgConnection (for brevity's sake)
         let conn: &PgConnection = &context.pool.get().unwrap();
         Vacancies::all_vacancies(conn)
     }
+    #[graphql(name = "getVacancyByUid")]
     pub fn get_vacancy_by_uid(
         context: &GraphQLContext,
         uid: String,
@@ -30,7 +32,7 @@ impl Query {
 // The root GraphQL mutation
 pub struct Mutation;
 
-#[juniper::object(Context = GraphQLContext)]
+#[graphql_object(Context = GraphQLContext)]
 impl Mutation {
     #[graphql(name = "createVacancy")]
     pub fn create_vacancy(
@@ -47,9 +49,9 @@ impl Mutation {
     }
 }
 
-// Root schema that pulls the query and mutation together.
-pub type Schema = RootNode<'static, Query, Mutation>;
+pub type Schema =
+    juniper::RootNode<'static, Query, Mutation, EmptySubscription<GraphQLContext>>;
 
 pub fn create_schema() -> Schema {
-    Schema::new(Query, Mutation)
+    Schema::new(Query, Mutation, EmptySubscription::new())
 }

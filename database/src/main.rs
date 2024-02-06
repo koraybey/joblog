@@ -7,36 +7,25 @@ extern crate joblog;
 extern crate juniper;
 extern crate r2d2;
 
-use std::{env, io};
-
-use actix_web::{middleware, App, HttpServer};
-
-use joblog::db::get_pool;
-use joblog::endpoints::graphql_endpoints;
+use actix_cors::Cors;
+use actix_web::{middleware::Logger, web::Data, App, HttpServer};
+use joblog::{db::get_pool, endpoints::register};
 
 #[actix_rt::main]
-async fn main() -> io::Result<()> {
-    logging_setup();
+async fn main() -> std::io::Result<()> {
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or("error"));
 
     // Instantiate a new connection pool
     let pool = get_pool();
 
-    // Start up the server, passing in (a) the connection pool
-    // to make it available to all endpoints and (b) the configuration
-    // function that adds the /graphql logic.
     HttpServer::new(move || {
         App::new()
-            .data(pool.clone())
-            .wrap(middleware::Logger::default())
-            .configure(graphql_endpoints)
+            .app_data(Data::new(pool.clone()))
+            .configure(register)
+            .wrap(Cors::permissive())
+            .wrap(Logger::default())
     })
-    .bind("127.0.0.1:4000")?
+    .bind(("127.0.0.1", 4000))?
     .run()
     .await
-}
-
-// TODO: more fine-grained logging setup
-fn logging_setup() {
-    env::set_var("RUST_LOG", "actix_web=info");
-    env_logger::init();
 }
