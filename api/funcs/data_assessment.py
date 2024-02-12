@@ -8,6 +8,7 @@ from llama_index import (
     SimpleDirectoryReader,
     VectorStoreIndex,
 )
+from llama_index.core.base_query_engine import BaseQueryEngine
 from llama_index.embeddings import HuggingFaceEmbedding
 from llama_index.llms import LlamaCPP
 from llama_index.llms.llama_utils import (
@@ -16,6 +17,7 @@ from llama_index.llms.llama_utils import (
 )
 from llama_index.storage.storage_context import StorageContext
 from llama_index.vector_stores import ChromaVectorStore
+from lmql import LLM
 
 from paths import DATABASE_DIR, LOCAL_MODELS_FOLDER, STATIC_FOLDER
 from utils import load_config
@@ -26,48 +28,52 @@ LOCAL_MODEL_NAME = config["local"]["model"]
 LOCAL_MODEL_TOKENIZER = config["local"]["tokenizer"]
 ABS_LOCAL_MODEL_PATH = f"{LOCAL_MODELS_FOLDER}/{LOCAL_MODEL_NAME}"
 
-vect_model_path = hf_hub_download(
-    repo_id=config["local"]["repo_id"],
-    filename=config["local"]["model"],
-    local_dir="local_models",
-)
 
-model = lmql.model(
-    f"local:llama.cpp:{ABS_LOCAL_MODEL_PATH}", tokenizer=LOCAL_MODEL_TOKENIZER, n_gpu_layers=-1, n_ctx=4096
-)
-embed_model = HuggingFaceEmbedding(model_name=config["local"]["embed_model"])
+def _load_model(): # type: ignore[return,empty-body, no-untyped-def]
+    vect_model_path = hf_hub_download(
+        repo_id=config["local"]["repo_id"],
+        filename=config["local"]["model"],
+        local_dir="local_models",
+    )
 
-llm = LlamaCPP(
-    model_path=vect_model_path,
-    context_window=config["local"]["n_ctx"],
-    model_kwargs={"n_gpu_layers": -1, "n_ctx": 4096},
-    messages_to_prompt=messages_to_prompt,
-    completion_to_prompt=completion_to_prompt,
-    verbose=True,
-)
+    lmql_model = lmql.model(
+        f"local:llama.cpp:{ABS_LOCAL_MODEL_PATH}", tokenizer=LOCAL_MODEL_TOKENIZER, n_gpu_layers=-1, n_ctx=4096
+    )
+    embed_model = HuggingFaceEmbedding(model_name=config["local"]["embed_model"])
 
-database = chromadb.PersistentClient(path=str(DATABASE_DIR))
-chroma_collection = database.get_or_create_collection("jobs")
+    llm = LlamaCPP(
+        model_path=vect_model_path,
+        context_window=config["local"]["n_ctx"],
+        model_kwargs={"n_gpu_layers": -1, "n_ctx": 4096},
+        messages_to_prompt=messages_to_prompt,
+        completion_to_prompt=completion_to_prompt,
+        verbose=True,
+    )
 
-job_service_context = ServiceContext.from_defaults(
-    llm=llm,
-    embed_model=embed_model,
-)
+    database = chromadb.PersistentClient(path=str(DATABASE_DIR))
+    chroma_collection = database.get_or_create_collection("jobs")
 
-job_vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
-job_storage_context = StorageContext.from_defaults(vector_store=job_vector_store)
+    job_service_context = ServiceContext.from_defaults(
+        llm=llm,
+        embed_model=embed_model,
+    )
 
-job_data = SimpleDirectoryReader(str(STATIC_FOLDER / "jobs")).load_data()
+    job_vector_store = ChromaVectorStore(chroma_collection=chroma_collection)
+    job_storage_context = StorageContext.from_defaults(vector_store=job_vector_store)
 
-job_index = VectorStoreIndex.from_documents(
-    job_data, storage_context=job_storage_context, service_context=job_service_context
-)
+    job_data = SimpleDirectoryReader(str(STATIC_FOLDER / "jobs")).load_data()
 
-jobs_query_engine = job_index.as_query_engine(response_mode="no_text", similarity_top_k=1)
+    job_index = VectorStoreIndex.from_documents(
+        job_data, storage_context=job_storage_context, service_context=job_service_context
+    )
+
+    jobs_query_engine = job_index.as_query_engine(response_mode="no_text", similarity_top_k=1)
+
+    return lmql_model, jobs_query_engine
 
 
 @lmql.query()
-def _analyse_resume_bullet_query(resume_bullet: str):  # type: ignore[return,empty-body, no-untyped-def]
+def _analyse_resume_bullet_query(resume_bullet, lmql_model, jobs_query_engine):  # type: ignore[return,empty-body, no-untyped-def]
     # fmt: off
     '''lmql
     argmax
@@ -84,7 +90,7 @@ def _analyse_resume_bullet_query(resume_bullet: str):  # type: ignore[return,emp
         "Is resume bullet relevant to job requirements and responsibilities?:[BOOL_RELEVANCE]\n"
         "Does resume bullet match job requirements and responsibilities?:[BOOL_MATCH]\n"
         "Briefly explain the relevance or match reason:[STRING_EXPLANATION]\n"
-    from model
+    from lmql_model
     where
     STOPS_AT(STRING_EXPLANATION, "\n") and len(TOKENS(STRING_EXPLANATION)) < 150
      and BOOL_RELEVANCE in ["true", "false"] and BOOL_MATCH in ["true", "false"]
@@ -93,7 +99,7 @@ def _analyse_resume_bullet_query(resume_bullet: str):  # type: ignore[return,emp
 
 
 @lmql.query()
-def _create_example_resume_bullet(resume_bullet: str):  # type: ignore[return,empty-body, no-untyped-def]
+def _create_example_resume_bullet(resume_bullet, lmql_model, jobs_query_engine):  # type: ignore[return,empty-body, no-untyped-def]
     # fmt: off
     '''lmql
     argmax
@@ -109,7 +115,7 @@ def _create_example_resume_bullet(resume_bullet: str):  # type: ignore[return,em
         "Create an example bullet point from original, tailored to the job requirements and responsibilities."
 
         "Example bullet point:•[STRING_EXAMPLE]\n"
-    from model
+    from lmql_model
     where
         STOPS_AT(STRING_EXAMPLE, ".") and len(TOKENS(STRING_EXAMPLE)) < 150
     '''
@@ -117,7 +123,8 @@ def _create_example_resume_bullet(resume_bullet: str):  # type: ignore[return,em
 
 
 def analyse_resume_bullet(resume_bullet: str) -> dict[str, Any]:
-    result = _analyse_resume_bullet_query(resume_bullet)
+    lmql_model, jobs_query_engine  = _load_model()
+    result = _analyse_resume_bullet_query(resume_bullet, lmql_model, jobs_query_engine)
     json_result = {
         "is_match": result.variables["BOOL_MATCH"],
         "is_relevant": result.variables["BOOL_RELEVANCE"],
@@ -127,5 +134,6 @@ def analyse_resume_bullet(resume_bullet: str) -> dict[str, Any]:
 
 
 def create_example_resume_bullet(resume_bullet: str) -> Any:
-    result = _create_example_resume_bullet(resume_bullet)
+    lmql_model, jobs_query_engine  = _load_model()
+    result = _create_example_resume_bullet(resume_bullet, lmql_model, jobs_query_engine)
     return result.variables["STRING_EXAMPLE"].strip()
