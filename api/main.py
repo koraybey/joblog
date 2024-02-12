@@ -10,8 +10,7 @@ from werkzeug.utils import secure_filename
 
 from funcs.data_assessment import analyse_resume_bullet, create_example_resume_bullet
 from funcs.data_structuring import generate_candidate_data
-
-# from gql_.mutations_ import create_vacancy_mutation
+from gql_.mutations_ import create_vacancy_mutation
 from paths import ALLOWED_EXTENSIONS, UPLOAD_FOLDER
 from utils import check_mps_backend, extract_text_from_pdf, scrape_from_linkedin
 
@@ -33,9 +32,8 @@ def create_vacancy() -> tuple[dict, int]:
         data = request.get_json()
         if "html" not in data:
             return {"error": "No HTML content provided."}, 400
-        result = scrape_from_linkedin(data)
-        print(result)
-        # result = create_vacancy_mutation(scraped_data)
+        scraped_data = scrape_from_linkedin(data)
+        result = create_vacancy_mutation(scraped_data)
     return {"response": result}, 200
 
 

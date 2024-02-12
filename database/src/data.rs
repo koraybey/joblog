@@ -4,7 +4,6 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use juniper::{FieldError, FieldResult};
 use uuid::Uuid;
-
 // This struct is basically a query manager. All the methods that it
 // provides are static, making it a convenient abstraction for interacting
 // with the database.
@@ -26,18 +25,18 @@ impl Vacancies {
         use super::schema::vacancies;
         let id = Uuid::new_v4().to_string();
 
+    
         let new_vacancy = NewVacancy {
             uid: &id,
             company: &new_vacancy.company,
-            position: &new_vacancy.position,
+            company_logo: &new_vacancy.company_logo,
+            title: &new_vacancy.title,
+            description: &new_vacancy.description,
+            experience_level: &new_vacancy.experience_level,
+            contract_type: &new_vacancy.contract_type,
             location: &new_vacancy.location,
-            contract: &new_vacancy.contract,
-            remote: &new_vacancy.remote,
-            salary_min: new_vacancy.salary_min,
-            salary_max: new_vacancy.salary_max,
-            about: &new_vacancy.about,
-            requirements: &new_vacancy.requirements,
-            responsibilities: &new_vacancy.responsibilities,
+            workplace_type: &new_vacancy.workplace_type,
+            company_url: &new_vacancy.company_url,
         };
 
         let res = diesel::insert_into(vacancies::table)

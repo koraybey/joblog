@@ -28,6 +28,7 @@ ignore = [
     "D102", # Add missing docstrings before prod. 
     "D103", # Add missing docstrings before prod. 
     "S101", # What's wrong with defensive use of assert? 
+    "D204"
 ]
 line-length = 120
 

@@ -2,7 +2,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Literal, LiteralString
+from typing import Any, Literal
 
 import bs4
 import torch
@@ -169,7 +169,7 @@ def md(html, **options): # type: ignore[no-untyped-def]
     return AddBlanklineAfterStrong(**options).convert(html)
 
 
-def scrape_from_linkedin(html: dict) -> str:
+def scrape_from_linkedin(html: dict) -> LinkedInJobPost:
     soup = BeautifulSoup(html["html"], "html.parser")
 
     # TODO Refactor these variable tests.
@@ -227,7 +227,7 @@ def scrape_from_linkedin(html: dict) -> str:
     else:
         print(ERROR_DESCRIPTION)
 
-    result = LinkedInJobPost(
+    return LinkedInJobPost(
         workplace_type=workplace_type,
         contract_type=contract_type,
         experience_level=experience_level,
@@ -238,7 +238,6 @@ def scrape_from_linkedin(html: dict) -> str:
         company_logo=company_logo,
         description=description,
     )
-    return result.model_dump_json()
 
 
 # Scrape LinkedIn Job Post via Chrome extension.

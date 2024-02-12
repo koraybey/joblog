@@ -1,48 +1,49 @@
 use super::schema::vacancies;
 use juniper::GraphQLInputObject;
 
-// The core data type undergirding the GraphQL interface
 #[derive(Queryable, juniper::GraphQLObject)]
 pub struct Vacancy {
-    pk: i32,
+    #[graphql(skip)]
+    pub pk: i32,
     pub uid: String,
+    pub company_logo: String,
     pub company: String,
-    pub position: String,
+    pub title: String,
+    pub description: String,
+    pub experience_level: String,  // Internship, Entry, Associate, Mid-Senior, Director, Executive
+    pub contract_type: String,   // Full-time, Part-time, Contract, Internship
     pub location: String,
-    pub contract: String,
-    pub remote: String,
-    pub salary_min: Option<i32>,
-    pub salary_max: Option<i32>,
-    pub about: String,
-    pub requirements: String,
-    pub responsibilities: String,
+    pub workplace_type: String,  // On-site, Hybrid, Remote
+    pub company_url: String,    
+    pub date_created: Option<chrono::NaiveDateTime>,
+    pub date_modified: Option<chrono::NaiveDateTime>,
+
 }
+
 #[derive(Insertable)]
 #[table_name = "vacancies"]
 pub struct NewVacancy<'a> {
     pub uid: &'a String,
+    pub company_logo: &'a String,
     pub company: &'a String,
-    pub position: &'a String,
+    pub title: &'a String,
+    pub description: &'a String,
+    pub experience_level: &'a String,  // Internship, Entry, Associate, Mid-Senior, Director, Executive
+    pub contract_type: &'a String,   // Full-time, Part-time, Contract, Internship
     pub location: &'a String,
-    pub contract: &'a String,
-    pub remote: &'a String,
-    pub salary_min: Option<i32>,
-    pub salary_max: Option<i32>,
-    pub about: &'a String,
-    pub requirements: &'a String,
-    pub responsibilities: &'a String,
+    pub workplace_type: &'a String,  // On-site, Hybrid, Remote
+    pub company_url: &'a String,
 }
 
 #[derive(GraphQLInputObject)]
 pub struct VacancyInput {
+    pub company_logo: String,
     pub company: String,
-    pub position: String,
+    pub title: String,
+    pub description: String,
+    pub experience_level: String,  // Internship, Entry, Associate, Mid-Senior, Director, Executive
+    pub contract_type: String,   // Full-time, Part-time, Contract, Internship
     pub location: String,
-    pub contract: String,
-    pub remote: String,
-    pub salary_min: Option<i32>,
-    pub salary_max: Option<i32>,
-    pub about: String,
-    pub requirements: String,
-    pub responsibilities: String,
+    pub workplace_type: String,  // On-site, Hybrid, Remote
+    pub company_url: String,    
 }

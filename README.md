@@ -22,11 +22,18 @@ _Empty_
 
 ## Backlog
 
-_Given that data scraping is very slow with local LLM, we may want to use traditional scrapers to get the relevant data, and use LLM for reasoning._
-- **Predetermine whether scrapped data contains a valid job description** - Not every page scraped via the extension will contain a job vacancy. We shouldn't allow generating scrubbed JSON data if scrapped page description has nothing to do with job vacancy. I don't know a good way to do this.
-- **Context window is too small for scraped data** - Some scraped site data (LinkedIn, for example) contains too much text. We may need to look into better ways to obtain relevant text from scraped data.
-- **Scraped data is sometimes not accurate** - Related to the item above, irrelevant details found in the scrapted text bloat the context and yield irrelevant output.</br >
+### Job scraping and logging
 
-- **Resume line analysis consumes too many tokens**: Each query contains RAG context and instructions, therefore total query token count hovers around 1K. Yet to find a reliable strategy for fast and simple reasoning tasks.
+ *Implemented classic scraping methods in favor of LLM data extraction as the former is significantly faster and does not consume precious resources. Only downside is scraper needs constant maintenance and testing, which I haven't implemented.*
+
+- [ ] **LinkedIn scraping bails when tag is missing or slice index is incorrect** - We need to account for optional fields, Which I forgot they exist.
+- [ ] **Add recruiter information if present** - We could increase our chances of success by drafting a nice introduction message to the recruiter. Hence, good to have on the database.
+- [x] **Predetermine whether scrapped data contains a valid job description** - Not every page scraped via the extension will contain a job vacancy. We shouldn't allow generating scrubbed JSON data if scrapped page description has nothing to do with job vacancy. I don't know a good way to do this.
+- [x] **Context window is too small for scraped data** - Some scraped site data (LinkedIn, for example) contains too much text. We may need to look into better ways to obtain relevant text from scraped data. *See above*
+- [x] **Scraped data is sometimes not accurate** - Related to the item above, irrelevant details found in the scrapted text bloat the context and yield irrelevant output. *See above*
+
+### Other
+
+- [ ] **Resume line analysis consumes too many tokens**: Each query contains RAG context and instructions, therefore total query token count hovers around 1K. Yet to find a reliable strategy for fast and simple reasoning tasks.
 - [x] **Stream LLM Output** - Unstructured string responses could be streamed. However, currently, project only deals with structured responses.
 - [x] **Speed up llama.cpp grammar** - Done, enabled GPU acceleration for Metal.

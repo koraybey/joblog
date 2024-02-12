@@ -1,5 +1,10 @@
 from pydantic import BaseModel, Field
 
+# def to_lower_camel(name: str) -> str:
+#     """Convert a snake_case string to lowerCamelCase."""
+#     upper = "".join(word.capitalize() for word in name.split("_"))
+#     return upper[:1].lower() + upper[1:]
+
 
 class WorkHistory(BaseModel):
     company: str = Field(..., description="Company name")
@@ -57,16 +62,13 @@ class Location(BaseModel):
     state: str
 
 
-
 class LinkedInJobPost(BaseModel):
-    # date_posted: date
-    # date_created: date
-    company_logo: str # url
+    company_logo: str
     company: str
     title: str
     description: str
-    experience_level: str # Internship, Entry, Associate, Mid-Senior, Director, Executive
+    experience_level: str  # Internship, Entry, Associate, Mid-Senior, Director, Executive
     contract_type: str  # Full-time, Part-time, Contract, Internship
     location: str
-    workplace_type: str # On-site, Hybrid, Remote
-    company_url: str # url?
+    workplace_type: str  # On-site, Hybrid, Remote
+    company_url: str

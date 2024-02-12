@@ -33,3 +33,4 @@ markdownify
 pyyaml
 pydantic
 jsonref
+pyhumps

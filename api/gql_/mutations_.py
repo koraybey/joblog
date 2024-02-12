@@ -1,28 +1,30 @@
+import json
 from typing import Any
 
+import humps
 from gql import gql
 
 from gql_.client_ import gql_client
-from models import CreateVacancy
+from models import LinkedInJobPost
 
 
-def create_vacancy_mutation(input_data: CreateVacancy) -> dict[str, Any]:
+def create_vacancy_mutation(input_data: LinkedInJobPost) -> dict[str, Any]:
     query = gql(
         """
         mutation CreateVacancy($input: VacancyInput!) {
             createVacancy(input: $input) {
+                companyLogo
                 company
-                position
+                title
+                description
+                experienceLevel
+                contractType
                 location
-                contract
-                remote
-                salaryMin
-                salaryMax
-                about
-                requirements
-                responsibilities
+                workplaceType
+                companyUrl
             }
         }
     """
     )
-    return gql_client.execute(query, variable_values={"input": input_data})
+    json_data = humps.camelize(json.loads(input_data.model_dump_json()))
+    return gql_client.execute(query, variable_values={"input": json_data})
