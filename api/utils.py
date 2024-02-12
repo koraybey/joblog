@@ -2,14 +2,17 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, LiteralString
 
+import bs4
 import torch
 import yaml
 from bs4 import BeautifulSoup
 from jsonref import replace_refs
+from markdownify import MarkdownConverter
 from PyPDF2 import PdfReader
 
+from models import LinkedInJobPost
 from paths import CONFIG_FOLDER
 
 # START
@@ -141,6 +144,105 @@ def scrape_job_posting(html: dict) -> str:
         s.extract()
     text = soup.get_text(" ", strip=True)
     return text
+
+
+# START
+# Scrape LinkedIn Job Post via Chrome extension.
+# Constants for regex patterns
+IMAGE_CLASS = "EntityPhoto"
+TITLE_CLASS = "job-title"
+DESCRIPTION_CLASS = "jobs-description-content__text"
+LOCATION_CLASS = "card__bullet"
+COMPANY_URL_CLASS = "primary-description-without-tagline"
+HIGHLIGHT_INSIGHT_CLASS = "__job-insight--highlight"
+SUBTITLE_CLASS = "primary-description-without-tagline"
+ERROR_DESCRIPTION = "No matching tag found or is a NavigableString"
+
+# Markdown conversion helper functions.
+class AddBlanklineAfterStrong(MarkdownConverter): # type: ignore[no-any-unimported]
+    """Custom MarkdownConverter that adds a blank line after <strong> tag."""
+
+    def convert_strong(self, el, text, convert_as_inline): # type: ignore[no-untyped-def]
+        return super().convert_strong(el, text, convert_as_inline) + "\n\n"
+
+def md(html, **options): # type: ignore[no-untyped-def]
+    return AddBlanklineAfterStrong(**options).convert(html)
+
+
+def scrape_from_linkedin(html: dict) -> str:
+    soup = BeautifulSoup(html["html"], "html.parser")
+
+    # TODO Refactor these variable tests.
+    _title = soup.find("h1", class_=re.compile(f"(?:^|){TITLE_CLASS}(?:$|)"))
+    if _title and isinstance(_title, bs4.element.Tag):
+        title = _title.get_text(strip=True)
+    else:
+        print(ERROR_DESCRIPTION)
+
+    _location = soup.find("span", class_=re.compile(f"(?:^|){LOCATION_CLASS}(?:$|)"))
+    if _location and isinstance(_location, bs4.element.Tag):
+        location = _location.get_text(strip=True)
+    else:
+        print(ERROR_DESCRIPTION)
+
+    _description = soup.find("div", class_=re.compile(f"(?:^|){DESCRIPTION_CLASS}(?:$|)"))
+    if _description and isinstance(_description, bs4.element.Tag):
+        _description_tag = _description.find("span")
+        _description_markdown = md(str(_description_tag), newline_style="BACKSLASH")
+        description = _description_markdown
+    else:
+        print(ERROR_DESCRIPTION)
+
+    _company_logo = soup.find("img", class_=re.compile(f"(?:^|){IMAGE_CLASS}(?:$|)"))
+    if _company_logo and isinstance(_company_logo, bs4.element.Tag):
+        company_logo = str(_company_logo["src"])
+    else:
+        print(ERROR_DESCRIPTION)
+
+    _company_url = soup.find("div", class_=re.compile(f"(?:^|){COMPANY_URL_CLASS}(?:$|)"))
+    if _company_url and isinstance(_company_url, bs4.element.Tag):
+        _company_url_tag = _company_url.find("a")
+        if _company_url_tag and isinstance(_company_url_tag, bs4.element.Tag):
+            company_url = str(_company_url_tag["href"])
+        else:
+            print(ERROR_DESCRIPTION)
+    else:
+        print(ERROR_DESCRIPTION)
+
+    _subtitle = soup.find("div", class_=re.compile(f"(?:^|){SUBTITLE_CLASS}(?:$|)"))
+    if _subtitle and isinstance(_subtitle, bs4.element.Tag):
+        _subtitle_children = _subtitle.findChildren()
+        company = _subtitle_children[0].get_text(strip=True)
+    else:
+        print(ERROR_DESCRIPTION)
+
+    _highlight = soup.find("li", class_=re.compile(f"(?:^|){HIGHLIGHT_INSIGHT_CLASS}(?:$|)"))
+    if _highlight and isinstance(_highlight, bs4.element.Tag):
+        _highlight_tag = _highlight.find("span")
+        if _highlight_tag and isinstance(_highlight_tag, bs4.element.Tag):
+            _highlight_children = _highlight_tag.findChildren()
+            workplace_type = _highlight_children[0].get_text(strip=True)
+            contract_type = _highlight_children[1].get_text(strip=True)
+            experience_level = _highlight_children[2].get_text(strip=True)
+    else:
+        print(ERROR_DESCRIPTION)
+
+    result = LinkedInJobPost(
+        workplace_type=workplace_type,
+        contract_type=contract_type,
+        experience_level=experience_level,
+        company=company,
+        company_url=company_url,
+        location=location,
+        title=title,
+        company_logo=company_logo,
+        description=description,
+    )
+    return result.model_dump_json()
+
+
+# Scrape LinkedIn Job Post via Chrome extension.
+# END
 
 
 def extract_text_from_pdf(file: Path) -> str:

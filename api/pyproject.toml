@@ -55,5 +55,5 @@ warn_unused_ignores = true
 show_error_codes = true
 
 [[tool.mypy.overrides]]
-module = ["huggingface_hub.*", "jsonref", "lmql"]
+module = ["huggingface_hub.*", "jsonref", "lmql", "markdownify.*"]
 ignore_missing_imports = true

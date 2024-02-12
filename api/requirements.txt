@@ -28,6 +28,7 @@ llama-cpp-python
 # parsers
 beautifulsoup4
 PyPDF2
+markdownify
 # data
 pyyaml
 pydantic

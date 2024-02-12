@@ -49,3 +49,24 @@ class LineAnalysis(BaseModel):
     is_match: bool
     is_relevant: bool
     relevance_or_match_reason: str
+
+
+class Location(BaseModel):
+    country: str
+    city: str
+    state: str
+
+
+
+class LinkedInJobPost(BaseModel):
+    # date_posted: date
+    # date_created: date
+    company_logo: str # url
+    company: str
+    title: str
+    description: str
+    experience_level: str # Internship, Entry, Associate, Mid-Senior, Director, Executive
+    contract_type: str  # Full-time, Part-time, Contract, Internship
+    location: str
+    workplace_type: str # On-site, Hybrid, Remote
+    company_url: str # url?
