@@ -1,5 +1,5 @@
-grpcio==1.56.2
 # For Macs, macOS >= 10.15 is required to install SkyPilot. Apple Silicon-based devices (e.g. Apple M1) must run pip uninstall grpcio; conda install -c conda-forge grpcio=1.43.0 prior to installing SkyPilot.
 # https://skypilot.readthedocs.io/en/latest/getting-started/installation.html#runpod
+grpcio==1.56.2
 skypilot-nightly[lambda,runpod]
 runpod

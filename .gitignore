@@ -1,7 +1,18 @@
-target
-.env
-uploads
-__pycache__
-config.yaml
-secrets.yaml
+# workspace
+.vscode
+.commit
 .DS_Store
+
+
+# folders
+local_models
+uploads
+chroma_db
+static
+
+# build
+.env
+.venv
+target
+.mypy_cache
+__pycache__

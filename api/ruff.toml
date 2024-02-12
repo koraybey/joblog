@@ -1,4 +1,0 @@
-[lint]
-select = ["E", "F", "D4", "PT", "PL"]
-ignore = ["E501", "D401", "D417", "D103"]
-extend-select = ["I"]

@@ -1,0 +1,29 @@
+local:
+  repo_id: TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF
+  model: mixtral-8x7b-instruct-v0.1.Q3_K_M.gguf
+  embed_model: BAAI/bge-m3
+  tokenizer: mistralai/Mixtral-8x7B-Instruct-v0.1
+  n_ctx: 8192
+  max_tokens: 4069
+  temperature: 0.6
+
+local_1:
+  repo_id: TheBloke/Mistral-7B-Instruct-v0.2-GGUF
+  model: mistral-7b-instruct-v0.2.Q8_0.gguf
+  embed_model: BAAI/bge-m3
+  tokenizer: mistralai/Mistral-7B-v0.1
+  n_ctx: 8192
+  max_tokens: 4069
+  temperature: 0.2
+
+mistral:
+  model: mistral-medium
+  embed_model: mistral-embed
+  max_tokens: 4096
+  temperature: 0.2
+
+openai:
+  model: gpt-3.5-turbo-1106
+  embed_model: text-embedding-3-small
+  max_tokens: 4096
+  temperature: 0.2

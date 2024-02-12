@@ -1,18 +1,18 @@
-import yaml
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 from llama_index import SQLDatabase
 from llama_index.indices.struct_store.sql_query import NLSQLTableQueryEngine
 from sqlalchemy import create_engine
 
-with open("../config.yaml", "r") as file:
-    config = yaml.safe_load(file)
+from utils import load_config
 
 engine = create_engine("postgresql+psycopg2://koraybey@localhost:5432/joblog")
+config = load_config("models")
 
 model_path = hf_hub_download(
     repo_id=config["local"]["repo_id"],
     filename=config["local"]["model"],
+    local_dir="local_models",
 )
 
 llm = Llama(

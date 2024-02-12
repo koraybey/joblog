@@ -1,11 +1,12 @@
-from gql import Client, gql
-from gql.transport.aiohttp import AIOHTTPTransport
+from typing import Any
 
-transport = AIOHTTPTransport(url="http://127.0.0.1:4000/graphql")
-client = Client(transport=transport, fetch_schema_from_transport=True)
+from gql import gql
+
+from gql_.client_ import gql_client
+from models import CreateVacancy
 
 
-def create_vacancy_mutation(input_data):
+def create_vacancy_mutation(input_data: CreateVacancy) -> dict[str, Any]:
     query = gql(
         """
         mutation CreateVacancy($input: VacancyInput!) {
@@ -24,4 +25,4 @@ def create_vacancy_mutation(input_data):
         }
     """
     )
-    return client.execute(query, variable_values={"input": input_data})
+    return gql_client.execute(query, variable_values={"input": input_data})

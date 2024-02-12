@@ -1,20 +1,34 @@
+# project
+mypy
+ruff
+python-dotenv
+# database, api, etc...
 flask
 flask_cors
-beautifulsoup4
-huggingface-hub
-gql
-llama-index
-pyyaml
-pydantic
 SQLAlchemy
 psycopg2-binary
+gql
+# llm
 tiktoken
-outlines
+huggingface-hub
 lmql
-jsonref
-# Textract comes with bunch of other dependencies. Make sure they are installed.
-# https://textract.readthedocs.io/en/stable/installation.html
-textract
-# Use following documentation if you are on Mac and enable Metal support.
+llama-index
+transformers
+chromadb
+# https://developer.apple.com/metal/pytorch/
+# MPS device? You need the extra-index-url argument.
+--extra-index-url https://download.pytorch.org/whl/nightly/cpu
+torch
+torchvision 
+torchaudio
+# MPS device? Re-install llama-cpp-python via
+# CMAKE_ARGS="-DLLAMA_METAL=on" pip install --force-reinstall --no-cache-dir llama-cpp-python
 # https://llama-cpp-python.readthedocs.io/en/latest/install/macos/
 llama-cpp-python
+# parsers
+beautifulsoup4
+PyPDF2
+# data
+pyyaml
+pydantic
+jsonref

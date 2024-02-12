@@ -1,4 +1,5 @@
 CARGO = cargo
+OPEN = open
 
 build:
 	$(CARGO) build
@@ -9,8 +10,8 @@ check:
 fmt:
 	$(CARGO) fmt
 
-open:
-	open http://localhost:4000/playground
+gql_playground:
+	${OPEN} http://localhost:4000/playground
 
 release:
 	$(CARGO) build --release

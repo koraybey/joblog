@@ -18,12 +18,15 @@
 
 ## Urgent
 
-- **Querying for each responsibility without context memory consumes too many prompt tokens**: Each query contains RAG context and instructions, therefore total query token count hovers around 1K. Strategy change needed asap if we rely on 3rd party computation power.
+_Empty_
 
 ## Backlog
 
+_Given that data scraping is very slow with local LLM, we may want to use traditional scrapers to get the relevant data, and use LLM for reasoning._
 - **Predetermine whether scrapped data contains a valid job description** - Not every page scraped via the extension will contain a job vacancy. We shouldn't allow generating scrubbed JSON data if scrapped page description has nothing to do with job vacancy. I don't know a good way to do this.
 - **Context window is too small for scraped data** - Some scraped site data (LinkedIn, for example) contains too much text. We may need to look into better ways to obtain relevant text from scraped data.
-- **Scraped data is sometimes not accurate** - Related to the item above, irrelevant details found in the scrapted text bloat the context and yield irrelevant output.
+- **Scraped data is sometimes not accurate** - Related to the item above, irrelevant details found in the scrapted text bloat the context and yield irrelevant output.</br >
+
+- **Resume line analysis consumes too many tokens**: Each query contains RAG context and instructions, therefore total query token count hovers around 1K. Yet to find a reliable strategy for fast and simple reasoning tasks.
 - [x] **Stream LLM Output** - Unstructured string responses could be streamed. However, currently, project only deals with structured responses.
 - [x] **Speed up llama.cpp grammar** - Done, enabled GPU acceleration for Metal.
