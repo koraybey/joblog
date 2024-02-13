@@ -21,6 +21,7 @@ def create_vacancy_mutation(input_data: LinkedInJobPost) -> dict[str, Any]:
                 contractType
                 location
                 workplaceType
+                url
                 companyUrl
             }
         }

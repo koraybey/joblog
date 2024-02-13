@@ -30,8 +30,8 @@ check_mps_backend()
 def create_vacancy() -> tuple[dict, int]:
     if request.method == "POST":
         data = request.get_json()
-        if "html" not in data:
-            return {"error": "No HTML content provided."}, 400
+        if all(v is not None for v in ["html", "url"]) in data:
+            return {"error": "URL and HTML content is not provided."}, 400
         scraped_data = scrape_from_linkedin(data)
         result = create_vacancy_mutation(scraped_data)
     return {"response": result}, 200
@@ -84,4 +84,4 @@ def upload_file(file: FileStorage) -> Path:
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000, host="127.0.0.1")
+    app.run(port=5000, host="127.0.0.1")

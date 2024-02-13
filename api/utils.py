@@ -3,6 +3,7 @@ import re
 import sys
 from pathlib import Path
 from typing import Any, Literal
+from urllib.parse import urljoin, urlparse
 
 import bs4
 import torch
@@ -148,6 +149,7 @@ def scrape_job_posting(html: dict) -> str:
 
 # START
 # Scrape LinkedIn Job Post via Chrome extension.
+
 # Constants for regex patterns
 IMAGE_CLASS = "EntityPhoto"
 TITLE_CLASS = "job-title"
@@ -156,89 +158,115 @@ LOCATION_CLASS = "card__bullet"
 COMPANY_URL_CLASS = "primary-description-without-tagline"
 HIGHLIGHT_INSIGHT_CLASS = "__job-insight--highlight"
 SUBTITLE_CLASS = "primary-description-without-tagline"
-ERROR_DESCRIPTION = "No matching tag found or is a NavigableString"
+
 
 # Markdown conversion helper functions.
-class AddBlanklineAfterStrong(MarkdownConverter): # type: ignore[no-any-unimported]
+class AddBlanklineAfterStrong(MarkdownConverter):  # type: ignore[no-any-unimported]
     """Custom MarkdownConverter that adds a blank line after <strong> tag."""
 
-    def convert_strong(self, el, text, convert_as_inline): # type: ignore[no-untyped-def]
+    def convert_strong(self, el, text, convert_as_inline):  # type: ignore[no-untyped-def]
         return super().convert_strong(el, text, convert_as_inline) + "\n\n"
 
-def md(html, **options): # type: ignore[no-untyped-def]
+
+# TODO Move exceptions somewhere else.
+class InvalidInputError(Exception):
+    """Raise error if DOM element is not found."""
+
+    def __init__(self, element: bs4.element.Tag | bs4.element.NavigableString | None):
+        super().__init__(f"{element} is not found or of invalid type.")
+
+
+def md(html, **options):  # type: ignore[no-untyped-def]
     return AddBlanklineAfterStrong(**options).convert(html)
 
 
-def scrape_from_linkedin(html: dict) -> LinkedInJobPost:
-    soup = BeautifulSoup(html["html"], "html.parser")
+def get_text(el: bs4.element.Tag | bs4.element.NavigableString | None) -> str:
+    if el and isinstance(el, bs4.element.Tag):
+        return el.get_text(strip=True)
+    else:
+        raise InvalidInputError(el)
 
-    # TODO Refactor these variable tests.
+
+def get_children(el: bs4.element.Tag | bs4.element.NavigableString | None) -> bs4.element.ResultSet:
+    if el and isinstance(el, bs4.element.Tag):
+        return el.findChildren()
+    else:
+        raise InvalidInputError(el)
+
+
+def check_el_type(el: bs4.element.Tag | bs4.element.NavigableString | None) -> bs4.element.Tag:
+    if el and isinstance(el, bs4.element.Tag):
+        return el
+    else:
+        raise InvalidInputError(el)
+
+
+def scrape_from_linkedin(data: dict) -> LinkedInJobPost:
+    soup = BeautifulSoup(data["html"], "html.parser")
+
+    # Job url. Doing some cleaning first.
+    _url =  urlparse(data["url"])
+    url = _url.scheme + "://" + _url.netloc + _url.path
+
+    # Job title
     _title = soup.find("h1", class_=re.compile(f"(?:^|){TITLE_CLASS}(?:$|)"))
-    if _title and isinstance(_title, bs4.element.Tag):
-        title = _title.get_text(strip=True)
-    else:
-        print(ERROR_DESCRIPTION)
+    title = get_text(_title)
 
+    # Location: City, Region, Country format (LinkedIn)
     _location = soup.find("span", class_=re.compile(f"(?:^|){LOCATION_CLASS}(?:$|)"))
-    if _location and isinstance(_location, bs4.element.Tag):
-        location = _location.get_text(strip=True)
-    else:
-        print(ERROR_DESCRIPTION)
+    location = get_text(_location)
 
+    # Job description
     _description = soup.find("div", class_=re.compile(f"(?:^|){DESCRIPTION_CLASS}(?:$|)"))
-    if _description and isinstance(_description, bs4.element.Tag):
-        _description_tag = _description.find("span")
-        _description_markdown = md(str(_description_tag), newline_style="BACKSLASH")
-        description = _description_markdown
-    else:
-        print(ERROR_DESCRIPTION)
+    _description_tag = check_el_type(_description).find("span")
+    description = md(str(_description_tag), newline_style="BACKSLASH")
 
+    # Company logo url
     _company_logo = soup.find("img", class_=re.compile(f"(?:^|){IMAGE_CLASS}(?:$|)"))
-    if _company_logo and isinstance(_company_logo, bs4.element.Tag):
-        company_logo = str(_company_logo["src"])
-    else:
-        print(ERROR_DESCRIPTION)
+    company_logo = str(check_el_type(_company_logo)["src"])
 
+    # Company profile url (LinkedIn)
     _company_url = soup.find("div", class_=re.compile(f"(?:^|){COMPANY_URL_CLASS}(?:$|)"))
-    if _company_url and isinstance(_company_url, bs4.element.Tag):
-        _company_url_tag = _company_url.find("a")
-        if _company_url_tag and isinstance(_company_url_tag, bs4.element.Tag):
-            company_url = str(_company_url_tag["href"])
-        else:
-            print(ERROR_DESCRIPTION)
-    else:
-        print(ERROR_DESCRIPTION)
+    _company_url_tag = check_el_type(_company_url).find("a")
+    _company_url_full = check_el_type(_company_url_tag)["href"]
+    _company_url_parsed = urlparse(str(_company_url_full))
+    # Scraped LinkedIn profile URL is https://www.linkedin.com/company/metacoregames/life/
+    # We need the company page, so we are removing the last path
+    _company_url_new_path = "/".join(_company_url_parsed.path.split("/")[:-1])
+    company_url = urljoin(str(_company_url_full), _company_url_new_path)
 
+    # Company name
     _subtitle = soup.find("div", class_=re.compile(f"(?:^|){SUBTITLE_CLASS}(?:$|)"))
-    if _subtitle and isinstance(_subtitle, bs4.element.Tag):
-        _subtitle_children = _subtitle.findChildren()
-        company = _subtitle_children[0].get_text(strip=True)
-    else:
-        print(ERROR_DESCRIPTION)
+    _subtitle_children = get_children(_subtitle)
+    company = get_text(_subtitle_children[0])
 
+    # Workplace type: Remote, Hybrid, On-site (LinkedIn)
+    # Contract type: Full-time, Part-time, Contract, Internship (LinkedIn)
+    # Experience level: Internship, Entry, Associate, Mid-Senior, Director, Executive (LinkedIn)
     _highlight = soup.find("li", class_=re.compile(f"(?:^|){HIGHLIGHT_INSIGHT_CLASS}(?:$|)"))
-    if _highlight and isinstance(_highlight, bs4.element.Tag):
-        _highlight_tag = _highlight.find("span")
-        if _highlight_tag and isinstance(_highlight_tag, bs4.element.Tag):
-            _highlight_children = _highlight_tag.findChildren()
-            workplace_type = _highlight_children[0].get_text(strip=True)
-            contract_type = _highlight_children[1].get_text(strip=True)
-            experience_level = _highlight_children[2].get_text(strip=True)
-    else:
-        print(ERROR_DESCRIPTION)
+    _highlight_tag = check_el_type(_highlight).find("span")
+    _highlight_children = get_children(_highlight_tag)
+    _highlight_children_all_fields_present = len(_highlight_children) == 3
+    workplace_type = get_text(_highlight_children[0]) if _highlight_children_all_fields_present else None
+    contract_type = get_text(
+        _highlight_children[1] if _highlight_children_all_fields_present else _highlight_children[0]
+    )
+    experience_level = get_text(
+        _highlight_children[2] if _highlight_children_all_fields_present else _highlight_children[1]
+    ).split(" ", 1)[0]  # Split is used because experience_level string contains a redundant "level" word.
 
     return LinkedInJobPost(
-        workplace_type=workplace_type,
-        contract_type=contract_type,
-        experience_level=experience_level,
-        company=company,
-        company_url=company_url,
-        location=location,
-        title=title,
-        company_logo=company_logo,
-        description=description,
+            company_logo=company_logo,
+            company=company,
+            title=title,
+            description=description,
+            experience_level=experience_level,
+            contract_type=contract_type,
+            location=location,
+            workplace_type=workplace_type,
+            url=url,
+            company_url=company_url,
     )
-
 
 # Scrape LinkedIn Job Post via Chrome extension.
 # END
