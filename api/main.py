@@ -10,7 +10,7 @@ from werkzeug.utils import secure_filename
 
 from funcs.data_assessment import analyse_resume_bullet, create_example_resume_bullet
 from funcs.data_structuring import generate_candidate_data
-from gql_.mutations_ import create_vacancy_mutation
+from gql_.mutations_ import create_vacancy_mutation, delete_vacancy_mutation
 from paths import ALLOWED_EXTENSIONS, UPLOAD_FOLDER
 from utils import check_mps_backend, extract_text_from_pdf, scrape_from_linkedin
 
@@ -34,6 +34,16 @@ def create_vacancy() -> tuple[dict, int]:
             return {"error": "URL and HTML content is not provided."}, 400
         scraped_data = scrape_from_linkedin(data)
         result = create_vacancy_mutation(scraped_data)
+    return {"response": result}, 200
+
+
+@app.route("/deleteVacancy", methods=["POST"])
+def delete_vacancy() -> tuple[dict, int]:
+    if request.method == "POST":
+        data = request.get_json()
+        if "uid" not in data:
+            return {"error": "uid is not provided."}, 400
+        result = delete_vacancy_mutation(data["uid"])
     return {"response": result}, 200
 
 
