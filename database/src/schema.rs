@@ -8,13 +8,13 @@ diesel::table! {
         company -> Varchar,
         title -> Varchar,
         description -> Text,
-        experience_level -> Varchar,
-        contract_type -> Varchar,
         location -> Varchar,
         workplace_type -> Nullable<Varchar>,
         url -> Varchar,
         company_url -> Varchar,
         date_created -> Nullable<Timestamp>,
         date_modified -> Nullable<Timestamp>,
+        experience_level -> Nullable<Varchar>,
+        contract_type -> Nullable<Varchar>,
     }
 }

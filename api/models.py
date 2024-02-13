@@ -56,8 +56,8 @@ class LinkedInJobPost(BaseModel):
     company: str
     title: str
     description: str
-    experience_level: str  # Internship, Entry, Associate, Mid-Senior, Director, Executive
-    contract_type: str  # Full-time, Part-time, Contract, Internship
+    experience_level: str | None  # Internship, Entry, Associate, Mid-Senior, Director, Executive
+    contract_type: str | None  # Full-time, Part-time, Contract, Internship
     location: str
     workplace_type: str | None  # On-site, Hybrid, Remote
     url: str

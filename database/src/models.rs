@@ -10,15 +10,14 @@ pub struct Vacancy {
     pub company: String,
     pub title: String,
     pub description: String,
-    pub experience_level: String,  // Internship, Entry, Associate, Mid-Senior, Director, Executive
-    pub contract_type: String,   // Full-time, Part-time, Contract, Internship
     pub location: String,
-    pub workplace_type: Option<String>,  // On-site, Hybrid, Remote
-    pub url: String,    
-    pub company_url: String,    
+    pub workplace_type: Option<String>, // On-site, Hybrid, Remote
+    pub url: String,
+    pub company_url: String,
     pub date_created: Option<chrono::NaiveDateTime>,
     pub date_modified: Option<chrono::NaiveDateTime>,
-
+    pub experience_level: Option<String>, // Internship, Entry, Associate, Mid-Senior, Director, Executive
+    pub contract_type: Option<String>,    // Full-time, Part-time, Contract, Internship
 }
 
 #[derive(Insertable)]
@@ -29,12 +28,12 @@ pub struct NewVacancy<'a> {
     pub company: &'a String,
     pub title: &'a String,
     pub description: &'a String,
-    pub experience_level: &'a String,  // Internship, Entry, Associate, Mid-Senior, Director, Executive
-    pub contract_type: &'a String,   // Full-time, Part-time, Contract, Internship
     pub location: &'a String,
-    pub workplace_type: Option<String>,  // On-site, Hybrid, Remote
+    pub workplace_type: Option<String>, // On-site, Hybrid, Remote
     pub url: &'a String,
     pub company_url: &'a String,
+    pub experience_level: Option<String>, // Internship, Entry, Associate, Mid-Senior, Director, Executive
+    pub contract_type: Option<String>,    // Full-time, Part-time, Contract, Internship
 }
 
 #[derive(GraphQLInputObject)]
@@ -43,10 +42,10 @@ pub struct VacancyInput {
     pub company: String,
     pub title: String,
     pub description: String,
-    pub experience_level: String,  // Internship, Entry, Associate, Mid-Senior, Director, Executive
-    pub contract_type: String,   // Full-time, Part-time, Contract, Internship
     pub location: String,
-    pub workplace_type: Option<String>,  // On-site, Hybrid, Remote
-    pub url: String,    
+    pub workplace_type: Option<String>, // On-site, Hybrid, Remote
+    pub url: String,
     pub company_url: String,
+    pub experience_level: Option<String>, // Internship, Entry, Associate, Mid-Senior, Director, Executive
+    pub contract_type: Option<String>,    // Full-time, Part-time, Contract, Internship
 }
