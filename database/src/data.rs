@@ -35,7 +35,8 @@ impl Vacancies {
             experience_level: &new_vacancy.experience_level,
             contract_type: &new_vacancy.contract_type,
             location: &new_vacancy.location,
-            workplace_type: &new_vacancy.workplace_type,
+            workplace_type: new_vacancy.workplace_type,
+            url: &new_vacancy.url,
             company_url: &new_vacancy.company_url,
         };
 

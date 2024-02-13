@@ -13,7 +13,8 @@ pub struct Vacancy {
     pub experience_level: String,  // Internship, Entry, Associate, Mid-Senior, Director, Executive
     pub contract_type: String,   // Full-time, Part-time, Contract, Internship
     pub location: String,
-    pub workplace_type: String,  // On-site, Hybrid, Remote
+    pub workplace_type: Option<String>,  // On-site, Hybrid, Remote
+    pub url: String,    
     pub company_url: String,    
     pub date_created: Option<chrono::NaiveDateTime>,
     pub date_modified: Option<chrono::NaiveDateTime>,
@@ -31,7 +32,8 @@ pub struct NewVacancy<'a> {
     pub experience_level: &'a String,  // Internship, Entry, Associate, Mid-Senior, Director, Executive
     pub contract_type: &'a String,   // Full-time, Part-time, Contract, Internship
     pub location: &'a String,
-    pub workplace_type: &'a String,  // On-site, Hybrid, Remote
+    pub workplace_type: Option<String>,  // On-site, Hybrid, Remote
+    pub url: &'a String,
     pub company_url: &'a String,
 }
 
@@ -44,6 +46,7 @@ pub struct VacancyInput {
     pub experience_level: String,  // Internship, Entry, Associate, Mid-Senior, Director, Executive
     pub contract_type: String,   // Full-time, Part-time, Contract, Internship
     pub location: String,
-    pub workplace_type: String,  // On-site, Hybrid, Remote
-    pub company_url: String,    
+    pub workplace_type: Option<String>,  // On-site, Hybrid, Remote
+    pub url: String,    
+    pub company_url: String,
 }
