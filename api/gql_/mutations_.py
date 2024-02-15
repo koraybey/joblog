@@ -8,7 +8,7 @@ from gql_.client_ import gql_client
 from models import LinkedInJobPost
 
 
-def create_vacancy_mutation(input_data: LinkedInJobPost) -> dict[str, Any]:
+def mutation_create_vacancy(input_data: LinkedInJobPost) -> dict[str, Any]:
     query = gql(
         """
         mutation CreateVacancy($input: VacancyInput!) {
@@ -31,12 +31,12 @@ def create_vacancy_mutation(input_data: LinkedInJobPost) -> dict[str, Any]:
     return gql_client.execute(query, variable_values={"input": json_data})
 
 
-def delete_vacancy_mutation(uid: str) -> dict[str, Any]:
+def mutation_delete_vacancy(uid: str) -> dict[str, Any]:
     query = gql(
         """
-        mutation DeleteVacancy($id: String!) {
-            deleteVacancy(id: $id)
+        mutation DeleteVacancy($uid: String!) {
+            deleteVacancy(uid: $uid)
         }
      """
     )
-    return gql_client.execute(query, variable_values={"id": uid})
+    return gql_client.execute(query, variable_values={"uid": uid})

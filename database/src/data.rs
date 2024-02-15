@@ -23,11 +23,11 @@ impl Vacancies {
         new_vacancy: VacancyInput,
     ) -> FieldResult<Vacancy> {
         use super::schema::vacancies;
-        let id = Uuid::new_v4().to_string();
+        let uid_ = Uuid::new_v4().to_string();
 
     
         let new_vacancy = NewVacancy {
-            uid: &id,
+            uid: &uid_,
             company: &new_vacancy.company,
             company_logo: &new_vacancy.company_logo,
             title: &new_vacancy.title,
@@ -47,9 +47,9 @@ impl Vacancies {
         graphql_translate(res)
     }
 
-    pub fn delete_vacancy(conn: &PgConnection, vacancy_id: String) -> FieldResult<bool> {
+    pub fn delete_vacancy(conn: &PgConnection, uid_: String) -> FieldResult<bool> {
         let old_count = vacancies.count().first::<i64>(conn);
-        match diesel::delete(vacancies.filter(uid.eq(vacancy_id))).execute(conn) {
+        match diesel::delete(vacancies.filter(uid.eq(uid_))).execute(conn) {
             Ok(_) => {
                 if vacancies.count().first(conn) == old_count.map(|count| count - 1) {
                     Ok(true)
@@ -66,11 +66,11 @@ impl Vacancies {
         }
     }
 
-    pub fn get_vacancy_by_id(
+    pub fn get_vacancy(
         conn: &PgConnection,
-        id: String,
+        uid_: String,
     ) -> FieldResult<Option<Vacancy>> {
-        match vacancies.filter(uid.eq(id)).get_result(conn) {
+        match vacancies.filter(uid.eq(uid_)).get_result(conn) {
             Ok(vacancy) => Ok(Some(vacancy)),
             Err(e) => match e {
                 // Without this translation, GraphQL will return an error rather

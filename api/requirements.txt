@@ -5,13 +5,14 @@ python-dotenv
 # database, api, etc...
 flask
 flask_cors
+waitress
 SQLAlchemy
 psycopg2-binary
 gql
 # llm
 tiktoken
 huggingface-hub
-lmql
+lmql[hf]
 llama-index
 transformers
 chromadb

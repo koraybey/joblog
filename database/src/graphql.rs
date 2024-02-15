@@ -19,13 +19,13 @@ impl Query {
         let conn: &PgConnection = &context.pool.get().unwrap();
         Vacancies::all_vacancies(conn)
     }
-    #[graphql(name = "getVacancyByUid")]
-    pub fn get_vacancy_by_uid(
+    #[graphql(name = "getVacancy")]
+    pub fn get_vacancy(
         context: &GraphQLContext,
         uid: String,
     ) -> FieldResult<Option<Vacancy>> {
         let conn: &PgConnection = &context.pool.get().unwrap();
-        Vacancies::get_vacancy_by_id(conn, uid)
+        Vacancies::get_vacancy(conn, uid)
     }
 }
 
@@ -43,9 +43,9 @@ impl Mutation {
         Vacancies::create_vacancy(conn, input)
     }
     #[graphql(name = "deleteVacancy")]
-    pub fn delete_vacancy(context: &GraphQLContext, id: String) -> FieldResult<bool> {
+    pub fn delete_vacancy(context: &GraphQLContext, uid: String) -> FieldResult<bool> {
         let conn: &PgConnection = &context.pool.get().unwrap();
-        Vacancies::delete_vacancy(conn, id)
+        Vacancies::delete_vacancy(conn, uid)
     }
 }
 
