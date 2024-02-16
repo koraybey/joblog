@@ -10,6 +10,7 @@ from waitress import serve
 from werkzeug.datastructures import FileStorage
 from werkzeug.utils import secure_filename
 
+from exceptions_ import UnconfiguredEnvironmentError
 from funcs.data_assessment import analyse_resume_bullet, create_example_resume_bullet
 from funcs.data_structuring import generate_candidate_data
 from gql_.mutations_ import mutation_create_vacancy, mutation_delete_vacancy
@@ -17,28 +18,12 @@ from gql_.queries_ import query_get_vacancy
 from paths import ALLOWED_EXTENSIONS, UPLOAD_FOLDER
 from utils import extract_text_from_pdf, scrape_from_linkedin
 
-
-# TODO Move exceptions somewhere else.
-class UnconfiguredEnvironmentError(Exception):
-    """Raise error if any of the required keys in .env is missing."""
-
-    def __init__(self, key_name: str):
-        super().__init__(f"{key_name} is not found in your environment.")
-
-
-def check_env_key_presence(key: str | None, key_name: str) -> str:
-    if key and isinstance(key, str):
-        return key
-    else:
-        raise UnconfiguredEnvironmentError(key_name)
-
-
 load_dotenv()
 
-FLASK_API_KEY = os.getenv("FLASK_API_KEY") if "FLASK_API_KEY" in os.environ else None
-API_HOST = os.getenv("API_HOST") if "API_HOST" in os.environ else None
-API_PORT = os.getenv("API_PORT") if "API_PORT" in os.environ else None
-ENV = os.getenv("ENV") if "ENV" in os.environ else None
+FLASK_API_KEY = os.getenv("FLASK_API_KEY")
+API_HOST = os.getenv("API_HOST")
+API_PORT = os.getenv("API_PORT")
+ENV = os.getenv("ENV")
 
 app = Flask(__name__)
 app.secret_key = FLASK_API_KEY
@@ -103,7 +88,7 @@ def create_analysis() -> tuple[dict, int]:
 def create_example() -> tuple[dict, int]:
     if request.method == "POST":
         data = request.get_json()
-        if all(v is not None for v in ["bullet", "job_uid"]) in data:
+        if any(v is None for v in ["bullet", "job_uid"]) in data:
             return {"error": "Resume bullet or job_uid not provided."}, 400
         result = create_example_resume_bullet(data)
     return result, 200
@@ -124,13 +109,15 @@ def upload_file(file: FileStorage) -> Path:
 
 
 if __name__ == "__main__":
-    if check_env_key_presence(ENV, "ENV") == "dev":
+    if any(v is None for v in [API_HOST, API_PORT, FLASK_API_KEY]):
+        raise UnconfiguredEnvironmentError
+    if ENV is None or ENV == "dev":
         app.run(
             debug=True,  # noqa: S201
-            port=int(check_env_key_presence(API_PORT, "API_PORT")),
-            host=check_env_key_presence(API_HOST, "API_HOST"),
+            port=(int(API_PORT) if API_PORT is not None else None),
+            host=API_HOST,
         )
     else:
         logger = logging.getLogger("waitress")
         logger.setLevel(logging.INFO)
-        serve(app, port=check_env_key_presence(API_PORT, "API_PORT"), host=check_env_key_presence(API_HOST, "API_HOST"))
+        serve(app, port=API_PORT, host=API_HOST)
