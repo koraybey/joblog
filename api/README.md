@@ -1,9 +1,11 @@
-# Installation (Unix/macOS)
+# Installation
+
+This module uses [uv package manager.](https://github.com/astral-sh/uv). You must install it first to create a venv and install the dependencies.
 
 Create a virtual environment
 
 ```shell
-python3 -m venv .venv
+uv venv  # Create a virtual environment at .venv
 ```
 
 Activate the environment
@@ -13,6 +15,8 @@ Activate the environment
 source .venv/bin/activate
 # fish
 source .venv/bin/activate.fish
+# windows
+.\.venv\Scripts\activate.ps1
 ```
 
 Confirm virtual environment is active
@@ -24,7 +28,7 @@ which python
 Install dependencies
 
 ```shell
-pip install -r requirements.txt
+uv pip install -r requirements.txt  # Install from a requirements.txt file.
 ```
 
 Install stubs
