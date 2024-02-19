@@ -9,16 +9,12 @@ from utils import load_config
 
 config = load_config("models")
 
-config = load_config("models")
-
 BACKEND = config["server"]["backend"]
 MODEL = config["server"]["model"]
 HOST = config["server"]["host"]
 PORT = config["server"]["port"]
 REPO_ID = config["server"]["repo_id"]
 TOKENIZER = config["server"]["tokenizer"]
-
-
 
 lmql_model = (
     lmql.model(f"llama.cpp:{LOCAL_MODELS_FOLDER.absolute()}/{MODEL}", endpoint=f"{HOST}:{PORT}", tokenizer=TOKENIZER)
@@ -27,41 +23,49 @@ lmql_model = (
 )
 
 
-@lmql.query()
+@lmql.query(model=lmql_model, verbose=True)
 def _analyse_resume_bullet_query(bullet, job_data):  # type: ignore[return,empty-body, no-untyped-def]
     # fmt: off
     '''lmql
-    sample(3, 0.2)
+    sample(n=1, temperature=0.5, max_len=2048)
+        "{:system}"
         "You assume the role of an expert human resources manager, hiring the best talent for the role."
         "You will be given a resume bullet from candidate's resume for assessment."
-        "You must compare it against the job responsibilities and requirements and provide an analysis for candidate to improve their resume.\n"
-        "Resume bullet: {bullet}\n"
-        "Job requirements and responsibilities: {job_data}\n"
-        "Is resume bullet relevant to job requirements and responsibilities?:[BOOL_RELEVANCE]"
-        "Does resume bullet match job requirements and responsibilities?:[BOOL_MATCH]"
-        "Briefly explain the reason why bullet is relevant or irrelevant to the job requirements and responsibilities:[STRING_EXPLANATION]"
-    from lmql_model
+        "You must compare it against the job responsibilities and requirements and provide an analysis for candidate to improve their resume."
+        "{:user}Resume bullet:\n{bullet}\n"
+        "{:user}Job description:\n{job_data}\n"
+        "{:user}Is resume bullet relevant to job description?"
+        "{:assistant}[BOOL_RELEVANCE]"
+        "{:user}Does resume bullet match job description?"
+        "{:assistant}[BOOL_MATCH]"
+        "{:user}Explain the relevancy or match reason in a few sentences. You must always provide a reason even if there is no match and relevance."
+        "{:assistant}[STRING_EXPLANATION]"
+        "{:user}Provide a more relevant, better aligned resume bullet example."
+        "{:assistant}[STRING_EXAMPLE]"
     where
-    STOPS_AT(STRING_EXPLANATION, "\n") and len(TOKENS(STRING_EXPLANATION)) < 240
+    STOPS_AT(STRING_EXPLANATION, "\n") and len(TOKENS(STRING_EXPLANATION)) < 200 and STOPS_AT(STRING_EXAMPLE, "\n") and len(TOKENS(STRING_EXAMPLE)) < 200
      and BOOL_RELEVANCE in ["true", "false"] and BOOL_MATCH in ["true", "false"]
     '''
     # fmt: on
 
 
-@lmql.query()
+@lmql.query(model=lmql_model, verbose=True)
 def _create_example_resume_bullet(bullet, job_data):  # type: ignore[return,empty-body, no-untyped-def]
     # fmt: off
     '''lmql
-    sample(3, 0.2)
-        "You assume the role of an expert human resources manager, hiring the best talent for the role."
-        "You will be given a resume bullet from candidate's resume."
-        "Create an example bullet point from original, tailored to the job requirements and responsibilities.\n"
-        "Resume bullet: {bullet}\n"
-        "Job requirements and responsibilities: {job_data}"
-        "Example bullet point:•[STRING_EXAMPLE]"
-    from lmql_model
+    sample(n=1, temperature=0.5, max_len=2048)
+        "{:system}"
+        "You are an expert human resources manager."
+        "You will be given a resume bullet from candidate's resume for assessment."
+        "Find the most relevant details from the job description and improve the resume bullet point to align it better with the relevant requirements and responsibilities."
+        "{:user}Resume bullet:\n{bullet}\n"
+        "{:user}Job description:\n{job_data}\n"
+        "{:user}Improved bullet point:"
+        "{:assistant}[EXAMPLE]"
+        "{:user}Reason for improvement:"
+        "{:assistant}[REASON]"
     where
-        STOPS_AT(STRING_EXAMPLE, ".") and len(TOKENS(STRING_EXAMPLE)) < 150
+        len(TOKENS(REASON)) < 200 and len(TOKENS(EXAMPLE)) < 200
     '''
     # fmt: on
 
@@ -74,9 +78,10 @@ def analyse_resume_bullet(data: dict[str, Any]) -> list[dict[str, Any]]:  # TODO
     json_results = []
     for i, result in enumerate(results):
         json_result = {
-            "is_match": result.variables["BOOL_MATCH"],
-            "is_relevant": result.variables["BOOL_RELEVANCE"],
-            "relevance_or_match_reason": result.variables["STRING_EXPLANATION"].strip(),
+            "match": result.variables["BOOL_MATCH"],
+            "relevance": result.variables["BOOL_RELEVANCE"],
+            "reason": result.variables["STRING_EXPLANATION"].strip(),
+            "example": result.variables["STRING_EXAMPLE"].strip(),
             "bullet": bullet[i],
         }
         json_results.append(json_result)
@@ -89,4 +94,8 @@ def create_example_resume_bullet(data: dict[str, Any]) -> Any:  # TODO Schema Va
     job_data = query_get_vacancy(job_uid)
 
     result = _create_example_resume_bullet(bullet, json.dumps(job_data))
-    return result.variables["STRING_EXAMPLE"].strip()
+    json_result = {
+        "example": result.variables["EXAMPLE"].strip(),
+        "reason": result.variables["REASON"].strip(),
+    }
+    return json_result

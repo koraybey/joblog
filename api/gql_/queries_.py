@@ -10,13 +10,13 @@ def query_get_vacancy(uid: str) -> dict[str, Any]:
         """
         query GetVacancy($uid: String!) {
             getVacancy(uid: $uid){
-                company
-                title
+                # company
+                # title
                 description
-                experienceLevel
-                contractType
-                workplaceType
-                location
+                # experienceLevel
+                # contractType
+                # workplaceType
+                # location
             }
         }
      """
