@@ -1,16 +1,13 @@
-ROOT_DIR := $(shell pwd)
+CONF_FILE = deploy.yaml
 
-all: api database frontend deployment
+serve:
+	python main.py
 
-api:
-    cd $(ROOT_DIR)/api && make
+deploy:
+	sky launch -c joblog $(CONF_FILE)
 
-database:
-    cd $(ROOT_DIR)/database && make
+launch:
+	sky launch -c joblog $(CONF_FILE)
 
-frontend:
-    cd $(ROOT_DIR)/frontend && make
-
-deployment:
-    cd $(ROOT_DIR)/api && make
-
+exec:
+	sky exec joblog $(CONF_FILE)

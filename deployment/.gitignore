@@ -1,0 +1,2 @@
+# A separate gitignore is needed for subdirectory so that SkyPilot ignores the .venv while cloning the workdir.
+.venv

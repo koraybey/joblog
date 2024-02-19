@@ -9,8 +9,8 @@ from utils import json_schema_to_grammar, json_schema_with_inlining, load_config
 config = load_config("models")
 
 model_path = hf_hub_download(
-    repo_id=config["local_1"]["repo_id"],
-    filename=config["local_1"]["model"],
+    repo_id=config["local"]["repo_id"],
+    filename=config["local"]["model"],
     local_dir="local_models",
 )
 
@@ -23,7 +23,7 @@ def generate_job_posting_data(text: str) -> JobPosting:
 
     llm = Llama(
         model_path=model_path,
-        n_ctx=config["local_1"]["n_ctx"],
+        n_ctx=config["local"]["n_ctx"],
         n_gpu_layers=-1,
         offload_kqv=True,
         verbose=True,
@@ -34,8 +34,8 @@ def generate_job_posting_data(text: str) -> JobPosting:
     output = llm(
         question,
         grammar=LlamaGrammar.from_string(json_schema_to_grammar(json_schema_with_inlining(JobPosting))),
-        max_tokens=config["local_1"]["max_tokens"],
-        temperature=config["local_1"]["temperature"],
+        max_tokens=config["local"]["max_tokens"],
+        temperature=config["local"]["temperature"],
     )
 
     print(json.dumps(json.loads(output["choices"][0]["text"]), indent=4))  # type: ignore[index]
@@ -52,7 +52,7 @@ def generate_create_vacancy_data(text: str) -> CreateVacancy:
 
     llm = Llama(
         model_path=model_path,
-        n_ctx=config["local_1"]["n_ctx"],
+        n_ctx=config["local"]["n_ctx"],
         n_gpu_layers=-1,
         offload_kqv=True,
         verbose=True,
@@ -63,8 +63,8 @@ def generate_create_vacancy_data(text: str) -> CreateVacancy:
     output = llm(
         question,
         grammar=LlamaGrammar.from_string(json_schema_to_grammar(json_schema_with_inlining(CreateVacancy))),
-        max_tokens=config["local_1"]["max_tokens"],
-        temperature=config["local_1"]["temperature"],
+        max_tokens=config["local"]["max_tokens"],
+        temperature=config["local"]["temperature"],
     )
 
     print(json.dumps(json.loads(output["choices"][0]["text"]), indent=4))  # type: ignore[index]
@@ -84,7 +84,7 @@ def generate_candidate_data(text: str) -> Candidate:
 
     llm = Llama(
         model_path=model_path,
-        n_ctx=config["local_1"]["n_ctx"],
+        n_ctx=config["local"]["n_ctx"],
         n_gpu_layers=-1,
         offload_kqv=True,
         verbose=True,
@@ -95,8 +95,8 @@ def generate_candidate_data(text: str) -> Candidate:
     output = llm(
         question,
         grammar=LlamaGrammar.from_string(json_schema_to_grammar(json_schema_with_inlining(Candidate))),
-        max_tokens=config["local_1"]["max_tokens"],
-        temperature=config["local_1"]["temperature"],
+        max_tokens=config["local"]["max_tokens"],
+        temperature=config["local"]["temperature"],
     )
 
     print(json.dumps(json.loads(output["choices"][0]["text"]), indent=4))  # type: ignore[index]

@@ -1,9 +1,7 @@
 import json
-import os
 from typing import Any
 
 import lmql
-from dotenv import load_dotenv
 
 from gql_.queries_ import query_get_vacancy
 from paths import LOCAL_MODELS_FOLDER
@@ -11,16 +9,21 @@ from utils import load_config
 
 config = load_config("models")
 
-load_dotenv()
+config = load_config("models")
 
-MODEL_PATH = os.getenv("MODEL_PATH")
-MODEL_BACKEND = os.getenv("MODEL_BACKEND")
-LOCAL_MODEL_TOKENIZER = config["local"]["tokenizer"]
+BACKEND = config["server"]["backend"]
+MODEL = config["server"]["model"]
+HOST = config["server"]["host"]
+PORT = config["server"]["port"]
+REPO_ID = config["server"]["repo_id"]
+TOKENIZER = config["server"]["tokenizer"]
+
+
 
 lmql_model = (
-    lmql.model(f"llama.cpp:{MODEL_PATH}", endpoint="localhost:9999", tokenizer=LOCAL_MODEL_TOKENIZER)
-    if MODEL_BACKEND == "llamacpp"
-    else lmql.model(MODEL_PATH, endpoint="localhost:9999")
+    lmql.model(f"llama.cpp:{LOCAL_MODELS_FOLDER.absolute()}/{MODEL}", endpoint=f"{HOST}:{PORT}", tokenizer=TOKENIZER)
+    if BACKEND == "llamacpp"
+    else lmql.model(REPO_ID, endpoint=f"{HOST}:{PORT}")
 )
 
 
@@ -28,7 +31,7 @@ lmql_model = (
 def _analyse_resume_bullet_query(bullet, job_data):  # type: ignore[return,empty-body, no-untyped-def]
     # fmt: off
     '''lmql
-    sample(1, 0.2)
+    sample(3, 0.2)
         "You assume the role of an expert human resources manager, hiring the best talent for the role."
         "You will be given a resume bullet from candidate's resume for assessment."
         "You must compare it against the job responsibilities and requirements and provide an analysis for candidate to improve their resume.\n"
@@ -36,7 +39,7 @@ def _analyse_resume_bullet_query(bullet, job_data):  # type: ignore[return,empty
         "Job requirements and responsibilities: {job_data}\n"
         "Is resume bullet relevant to job requirements and responsibilities?:[BOOL_RELEVANCE]"
         "Does resume bullet match job requirements and responsibilities?:[BOOL_MATCH]"
-        "Briefly explain the relevancy or match reason of the resume bullet:[STRING_EXPLANATION]"
+        "Briefly explain the reason why bullet is relevant or irrelevant to the job requirements and responsibilities:[STRING_EXPLANATION]"
     from lmql_model
     where
     STOPS_AT(STRING_EXPLANATION, "\n") and len(TOKENS(STRING_EXPLANATION)) < 240
@@ -49,7 +52,7 @@ def _analyse_resume_bullet_query(bullet, job_data):  # type: ignore[return,empty
 def _create_example_resume_bullet(bullet, job_data):  # type: ignore[return,empty-body, no-untyped-def]
     # fmt: off
     '''lmql
-    sample(1, 0.2)
+    sample(3, 0.2)
         "You assume the role of an expert human resources manager, hiring the best talent for the role."
         "You will be given a resume bullet from candidate's resume."
         "Create an example bullet point from original, tailored to the job requirements and responsibilities.\n"

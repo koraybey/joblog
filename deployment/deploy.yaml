@@ -2,14 +2,11 @@ resources:
   # lambda and runpod do not support custom images.
   # image_id: gpuci/miniforge-cuda-driver:11.2-devel-ubuntu18.04
   ordered:
-    - cloud: lambda
-      accelerators: RTX6000:1
-    - cloud: runpod
-      accelerators: RTXA6000:1
     - cloud: runpod
       accelerators: A40:1
-    - cloud: lambda
-      accelerators: A6000:1
+    # skypilot does not work reliably with lamba cloud
+    # - cloud: lambda
+    #   accelerators: A6000:1
     # - cloud: lambda
     #   accelerators: A100:1
     # - cloud: runpod
@@ -19,17 +16,17 @@ num_nodes: 1 # Number of VMs to launch
 
 # Working directory (optional) containing the project codebase.
 # Its contents are synced to ~/sky_workdir/ on the cluster.
-workdir: ../api
+workdir: .
 
 # Commands to be run before executing the job.
 # Typical use: pip install -r requirements.txt, git clone, etc.
 setup: |
   echo 'export TERM=xterm' >> ~/.bashrc 
-  conda install cudatoolkit-dev -y
-  pip install -r requirements.txt
-  CMAKE_ARGS="-DLLAMA_CUBLAS=on" pip install llama-cpp-python --upgrade --force-reinstall --no-cache-dir
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  uv venv
+  uv pip install -r requirements.txt
 
 # Commands to run as a job.
 # Typical use: launch the main program.
-# run: |
-#   python app.py
+run: |
+  make serve

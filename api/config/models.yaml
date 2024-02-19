@@ -7,7 +7,10 @@ local:
   max_tokens: 4069
   temperature: 0.6
 
-local_1:
+server:
+  host: 0.0.0.0
+  port: 8080
+  backend: llamacpp
   repo_id: TheBloke/Mistral-7B-Instruct-v0.2-GGUF
   model: mistral-7b-instruct-v0.2.Q8_0.gguf
   embed_model: BAAI/bge-m3
