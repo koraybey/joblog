@@ -13,5 +13,5 @@ CREATE TABLE Vacancies (
     date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     date_modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     experience_level VARCHAR,
-    contract_type VARCHAR,
+    contract_type VARCHAR
 );
