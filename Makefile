@@ -1,15 +1,16 @@
 ROOT_DIR := $(shell pwd)
+CARGO = cargo
 
-all: api database frontend deployment
+all: api database
 
 api:
-    cd $(ROOT_DIR)/api && make
+	packages/api/.venv/bin/python packages/api/main.py
 
 database:
-    cd $(ROOT_DIR)/database && make
+	cargo run database
 
-frontend:
-    cd $(ROOT_DIR)/frontend && make
+check:
+	$(CARGO) clippy
 
-deployment:
-    cd $(ROOT_DIR)/api && make
+fmt:
+	$(CARGO) fmt
