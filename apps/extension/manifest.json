@@ -1,8 +1,7 @@
 {
-  "name": "Joblog",
+  "name": "extension",
   "version": "0.1",
   "manifest_version": 3,
-  "description": "Log the jobs for future analysis using the Joblog app.",
   "permissions": [
     "scripting",
     "tabs",
