@@ -1,7 +1,7 @@
-'use client'
-
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { ColumnDef } from '@tanstack/react-table'
-import { MoreHorizontal } from 'lucide-react'
+import { Building2, MoreHorizontal } from 'lucide-react'
+import * as R from 'ramda'
 
 import type { Vacancy } from '@/__generated__/gql/graphql'
 import { Button } from '@/components/ui/button'
@@ -13,12 +13,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type Payment = {
-    uid: string
-}
+import { deleteVacancy } from '@/hooks/useDeleteVacancy'
+import { formatDateRelative } from '@/lib/utils'
 
 export const columns: ColumnDef<Vacancy>[] = [
     {
@@ -29,12 +25,20 @@ export const columns: ColumnDef<Vacancy>[] = [
 
             return (
                 <div className={'flex gap-4 items-center'}>
-                    <img
-                        style={{ borderRadius: 4 }}
-                        src={job.companyLogo}
-                        width={32}
-                        height={32}
-                    />
+                    <div
+                        className={
+                            'flex w-9 h-9 items-center justify-center rounded-sm overflow-hidden'
+                        }
+                    >
+                        {R.isEmpty(job.companyLogo) ? (
+                            <Building2 className={'h-4 w-4 border'} />
+                        ) : (
+                            <img
+                                className={'w-full h-full '}
+                                src={job.companyLogo}
+                            />
+                        )}
+                    </div>
                     <span>{job.company}</span>
                 </div>
             )
@@ -55,12 +59,19 @@ export const columns: ColumnDef<Vacancy>[] = [
     {
         accessorKey: 'dateCreated',
         header: 'Created',
+        cell: ({ row }) => {
+            const job = row.original
+            // codegen generates wrong scalar types because it does not recognize chrono::NaiveDateTime types.
+            // TODO Fix createdAt and updatedAt types on db
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+            const date = formatDateRelative(job?.dateCreated)
+            return <span className={'capitalize::first-letter'}>{date}</span>
+        },
     },
     {
         id: 'actions',
         cell: ({ row }) => {
             const job = row.original
-
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -82,8 +93,9 @@ export const columns: ColumnDef<Vacancy>[] = [
                             <Button
                                 size={'sm'}
                                 className={'w-full'}
+                                // eslint-disable-next-line react/jsx-no-bind
                                 onClick={() =>
-                                    void navigator.clipboard.writeText(job.uid)
+                                    void deleteVacancy({ uid: job.uid })
                                 }
                                 variant={'destructive'}
                             >

@@ -1,7 +1,8 @@
 {
-  "name": "extension",
+  "name": "Joblog",
   "version": "0.1",
   "manifest_version": 3,
+  "description": "Transfer the jobs to Joblog app.",
   "permissions": [
     "scripting",
     "tabs",

@@ -27,6 +27,7 @@ module.exports = {
         'unicorn/prevent-abbreviations': 'off',
         'unicorn/filename-case': 'off',
         'unicorn/no-array-callback-reference': 'off',
+        'functional/immutable-data': 'off',
         'prefer-template': 'error',
         'no-console': 'error',
         'object-shorthand': 'error',
@@ -42,7 +43,7 @@ module.exports = {
             },
         ],
     },
-    ignorePatterns: ['__generated__'],
+    ignorePatterns: ['__generated__', 'lib', 'public'],
     overrides: [
         {
             files: ['*.ts', '*.tsx'],
@@ -60,6 +61,7 @@ module.exports = {
             rules: {
                 'functional/functional-parameters': 'off',
                 'functional/prefer-immutable-types': 'off',
+                'functional/immutable-data': 'off',
                 'functional/no-expression-statements': 'off',
                 'functional/no-mixed-types': 'off',
                 'react/jsx-curly-brace-presence': [
