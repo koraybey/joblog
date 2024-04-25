@@ -1,32 +1,31 @@
-import { ThemeProvider } from "@/components/theme-provider"
-import "./App.css";
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import axios from 'axios'
 import * as R from 'ramda'
-
 import useSWR from 'swr'
-import { DataTable } from "./jobs/data-table";
-import { columns } from "./jobs/columns";
-import { Vacancy } from "./__generated__/gql/graphql";
+
+import { ThemeProvider } from '@/components/theme-provider'
+
+import type { Vacancy } from './__generated__/gql/graphql'
+import { columns } from './jobs/columns'
+import { DataTable } from './jobs/data-table'
 
 export const fetcher = (query: string) =>
-	axios({
-		url: 'http://127.0.0.1:4000/graphql',
-		method: 'post',
-		headers: { 'Content-type': 'application/json' },
-		data: { query },
-	})
-		.then((res) => {
-			return R.prop('data', res.data)
-		})
-		.catch((error) => {
-			throw new TypeError(`Things exploded: ${error}`)
-		})
+    axios({
+        url: 'http://127.0.0.1:4000/graphql',
+        method: 'post',
+        headers: { 'Content-type': 'application/json' },
+        data: { query },
+    })
+        .then((res) => {
+            return R.prop('data', res.data)
+        })
+        .catch((error) => {
+            return new TypeError(`Things exploded: ${error}`)
+        })
 
-
-
-function App() {
-	const { data, isLoading } = useSWR<{ allVacancies: Vacancy[] }>(
-		`{
+const App = () => {
+    const { data, isLoading } = useSWR<{ allVacancies: Vacancy[] }>(
+        `{
 			allVacancies {
 					uid
 					companyLogo
@@ -44,15 +43,15 @@ function App() {
 			 }
 		}
 		`,
-		fetcher
-	)
-	if (!data || isLoading) return null
+        fetcher
+    )
+    if (!data || isLoading) return
 
-	return (
-		<ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-			      <DataTable columns={columns} data={data?.allVacancies} />
-		</ThemeProvider>
-	);
+    return (
+        <ThemeProvider defaultTheme={'dark'} storageKey={'vite-ui-theme'}>
+            <DataTable columns={columns} data={data?.allVacancies} />
+        </ThemeProvider>
+    )
 }
 
-export default App;
+export default App
