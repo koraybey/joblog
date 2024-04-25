@@ -5,21 +5,41 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "codegen": "bun --env-file=../../.env run graphql-codegen --config codegen.ts",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri"
   },
   "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@tanstack/react-table": "^8.16.0",
+    "@tauri-apps/api": "^1",
+    "autoprefixer": "^10.4.19",
+    "axios": "^1.6.8",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.373.0",
+    "postcss": "^8.4.38",
+    "ramda": "^0.29.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "@tauri-apps/api": "^1"
+    "swr": "^2.2.5",
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss": "^3.4.3",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/client-preset": "^4.2.5",
+    "@tauri-apps/cli": "^1",
+    "@types/bun": "^1.1.0",
+    "@types/node": "^20.12.7",
+    "@types/ramda": "^0.29.12",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.2.1",
     "typescript": "^5.0.2",
-    "vite": "^5.0.0",
-    "@tauri-apps/cli": "^1"
+    "vite": "^5.0.0"
   }
 }
