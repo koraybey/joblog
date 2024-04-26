@@ -4,8 +4,9 @@ from urllib.parse import parse_qs, urljoin, urlparse
 
 import bs4
 from bs4 import BeautifulSoup
+from markdownify import markdownify
 
-from exceptions import AddBlanklineAfterStrong, InvalidInputError
+from exceptions import InvalidInputError
 from models import LinkedInJobPost
 
 
@@ -20,7 +21,7 @@ def create_job_posting(html: dict) -> str:
 IMAGE_CLASS = "EntityPhoto"
 TITLE_CLASS = "card__job-title"
 LOCATION_CLASS = "card__bullet"
-DESCRIPTION_CLASS = "jobs-description-content__text"
+DESCRIPTION_CLASS = "jobs-box__html-content"
 COMPANY_URL_CLASS = "primary-description-without-tagline"
 HIGHLIGHT_INSIGHT_CLASS = "__job-insight--highlight"
 SUBTITLE_CLASS = "primary-description-without-tagline"
@@ -44,11 +45,6 @@ VAR_ERRORS = LinkedInJobPost(
 
 
 ElementType = bs4.element.Tag | bs4.element.NavigableString | None
-
-
-
-def md(html, **options):  # type: ignore[no-untyped-def]
-    return AddBlanklineAfterStrong(**options).convert(html)
 
 
 def get_text(el: ElementType, el_name: str) -> str:
@@ -96,9 +92,7 @@ def scrape_from_linkedin(data: dict) -> LinkedInJobPost:  # type: ignore[return]
     location = get_text(soup.find("span", class_=re.compile(f"(?:^|){LOCATION_CLASS}(?:$|)")), "Job location")
 
     # Job description
-    description = md(
-        str(soup.find("div", class_=re.compile(f"(?:^|){DESCRIPTION_CLASS}(?:$|)"))), newline_style="BACKSLASH"
-    )
+    description = markdownify(str(soup.find("div", class_=re.compile(f"(?:^|){DESCRIPTION_CLASS}(?:$|)")).find('div')))
 
     # Company logo url
     _company_logo = soup.find("img", class_=re.compile(f"(?:^|){IMAGE_CLASS}(?:$|)"))

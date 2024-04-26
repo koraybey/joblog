@@ -59,6 +59,7 @@ module.exports = {
                 project: true,
             },
             rules: {
+                'functional/no-return-void': 'off',
                 'functional/functional-parameters': 'off',
                 'functional/prefer-immutable-types': 'off',
                 'functional/immutable-data': 'off',

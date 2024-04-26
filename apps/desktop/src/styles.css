@@ -74,3 +74,20 @@
       @apply bg-background text-foreground;
     }
   }
+
+  .markdown p {
+    padding: 8px 0;
+  }
+
+  .markdown li p {
+    padding: 2px;
+  }
+
+  .markdown ul {
+    padding: 4px;
+  }
+
+  .markdown > ul > li {
+    list-style-type: circle;
+    margin-left:  12px;
+  }

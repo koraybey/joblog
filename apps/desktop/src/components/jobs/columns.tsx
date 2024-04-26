@@ -4,6 +4,7 @@ import { Building2, MoreHorizontal } from 'lucide-react'
 import * as R from 'ramda'
 
 import type { Vacancy } from '@/__generated__/gql/graphql'
+import { useDetailStore } from '@/App'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -49,10 +50,6 @@ export const columns: ColumnDef<Vacancy>[] = [
         header: 'Title',
     },
     {
-        accessorKey: 'experienceLevel',
-        header: 'Experience',
-    },
-    {
         accessorKey: 'location',
         header: 'Location',
     },
@@ -72,6 +69,8 @@ export const columns: ColumnDef<Vacancy>[] = [
         id: 'actions',
         cell: ({ row }) => {
             const job = row.original
+            const setVacancy = useDetailStore.getState().setVacancy
+
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -86,8 +85,21 @@ export const columns: ColumnDef<Vacancy>[] = [
                         <DropdownMenuItem>Withdrawn</DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem>Open in browser</DropdownMenuItem>
-                        <DropdownMenuItem>Copy link</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => void setVacancy(job)}>
+                            View
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => void window.open(job.url)}
+                        >
+                            Open link
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() =>
+                                void navigator.clipboard.writeText(job.url)
+                            }
+                        >
+                            Copy link
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem>
                             <Button

@@ -13,5 +13,5 @@ export const fetcher = (query: string) =>
             return R.prop('data', res.data)
         })
         .catch((error) => {
-            return new TypeError(`Things exploded: ${error}`)
+            return new Error(`Things exploded: ${error}`)
         })
