@@ -15,3 +15,7 @@ export const fetcher = (query: string) =>
         .catch((error) => {
             return new Error(`Things exploded: ${error}`)
         })
+
+export const openUrl = (url: string) => () => void window.open(url)
+export const copyToClipboard = (url: string) => () =>
+    void navigator.clipboard.writeText(url)

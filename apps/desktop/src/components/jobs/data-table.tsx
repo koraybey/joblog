@@ -7,6 +7,8 @@ import {
     useReactTable,
 } from '@tanstack/react-table'
 
+import { Vacancy } from '@/__generated__/gql/graphql'
+import { useDetailStore } from '@/App'
 import {
     Table,
     TableBody,
@@ -25,6 +27,8 @@ export const DataTable = <TData, TValue>({
     columns,
     data,
 }: DataTableProperties<TData, TValue>) => {
+    const setVacancy = useDetailStore((state) => state.setVacancy)
+
     const table = useReactTable({
         data,
         columns,
@@ -58,6 +62,10 @@ export const DataTable = <TData, TValue>({
                         table.getRowModel().rows.map((row) => (
                             <TableRow
                                 key={row.id}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onClick={() =>
+                                    setVacancy(row?.original as Vacancy)
+                                }
                                 data-state={row.getIsSelected() && 'selected'}
                             >
                                 {row.getVisibleCells().map((cell) => (

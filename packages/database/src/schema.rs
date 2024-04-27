@@ -31,7 +31,11 @@ diesel::table! {
         date_modified -> Nullable<Timestamp>,
         experience_level -> Nullable<Varchar>,
         contract_type -> Nullable<Varchar>,
+        status -> Nullable<Varchar>,
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(analyses, vacancies,);
+diesel::allow_tables_to_appear_in_same_query!(
+    analyses,
+    vacancies,
+);

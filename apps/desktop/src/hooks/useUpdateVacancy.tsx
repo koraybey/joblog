@@ -5,19 +5,30 @@ import { Vacancy } from '@/__generated__/gql/graphql'
 
 import { allVacanciesQuery } from './useVacancy'
 
-export const deleteVacancyQuery = `
-mutation DeleteVacancy($uid: String!) {
-    deleteVacancy(uid: $uid)
-}
+export const updateVacancyQuery = `
+mutation updateVacancy($input: VacancyMutation!) {
+    updateVacancy(input: $input) { 
+        uid
+        status
+    }
+  }
 `
 
-export const deleteVacancy = async ({ uid }: Pick<Vacancy, 'uid'>) =>
+export const updateVacancy = async ({
+    uid,
+    status,
+}: Pick<Vacancy, 'uid' | 'status'>) =>
     await axios
         .post(
             'http://127.0.0.1:4000/graphql',
             {
-                query: deleteVacancyQuery,
-                variables: { uid },
+                query: updateVacancyQuery,
+                variables: {
+                    input: {
+                        uid,
+                        status,
+                    },
+                },
             },
             {
                 headers: { 'Content-type': 'application/json; charset=UTF-8' },

@@ -92,7 +92,13 @@ def scrape_from_linkedin(data: dict) -> LinkedInJobPost:  # type: ignore[return]
     location = get_text(soup.find("span", class_=re.compile(f"(?:^|){LOCATION_CLASS}(?:$|)")), "Job location")
 
     # Job description
-    description = markdownify(str(soup.find("div", class_=re.compile(f"(?:^|){DESCRIPTION_CLASS}(?:$|)")).find('div')))
+    description = markdownify(
+        str(
+            check_el_type(
+                soup.find("div", class_=re.compile(f"(?:^|){DESCRIPTION_CLASS}(?:$|)")), "Company profile url"
+            ).find("div")
+        )
+    )
 
     # Company logo url
     _company_logo = soup.find("img", class_=re.compile(f"(?:^|){IMAGE_CLASS}(?:$|)"))

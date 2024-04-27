@@ -21,6 +21,7 @@ export const allVacanciesQuery = `
         companyUrl
         dateCreated
         dateModified
+        status
     }
 }
 `
