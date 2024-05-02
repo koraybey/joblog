@@ -1,6 +1,6 @@
 import type { ColumnDef } from '@tanstack/react-table'
 import clsx from 'clsx'
-import { Building2, MoreHorizontal } from 'lucide-react'
+import { ArrowUpDown, Building2, MoreHorizontal } from 'lucide-react'
 import * as R from 'ramda'
 
 import type { Vacancy } from '@/__generated__/gql/graphql'
@@ -72,38 +72,120 @@ export const columns: ColumnDef<Vacancy>[] = [
         header: 'Title',
     },
     {
-        accessorKey: 'dateModified',
-        header: 'Updated',
+        accessorKey: 'dateCreated',
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant={'ghost'}
+                    // eslint-disable-next-line react/jsx-no-bind
+                    onClick={() =>
+                        column.toggleSorting(column.getIsSorted() === 'asc')
+                    }
+                >
+                    Created
+                    <ArrowUpDown className={'ml-2 h-4 w-4'} />
+                </Button>
+            )
+        },
         cell: ({ row }) => {
             const job = row.original
             // codegen generates wrong scalar types because it does not recognize chrono::NaiveDateTime types.
             // TODO Fix createdAt and updatedAt types on db
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             const date = formatDateRelative(job?.dateModified)
-            return <span className={'capitalize::first-letter'}>{date}</span>
+            return (
+                <div className={'capitalize::first-letter mx-5 text-end'}>
+                    {date}
+                </div>
+            )
         },
     },
     {
         accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => {
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant={'ghost'}
+                    // eslint-disable-next-line react/jsx-no-bind
+                    onClick={() =>
+                        column.toggleSorting(column.getIsSorted() === 'asc')
+                    }
+                >
+                    Status
+                    <ArrowUpDown className={'ml-2 h-4 w-4'} />
+                </Button>
+            )
+        },
+        cell: ({ row, column }) => {
             const job = row.original
             const style = status?.find((s) => s.status === row.original.status)
             return (
-                <div
-                    className={clsx(
-                        'flex flex-row items-center font-medium',
-                        style?.text
-                    )}
-                    key={job.description}
-                >
-                    <div
-                        className={clsx(
-                            'w-2 h-2 rounded mr-1.5',
-                            style?.background
-                        )}
-                    ></div>
-                    {job.status}
+                <div className={'flex flex-row gap-2'}>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant={'ghost'}
+                                // eslint-disable-next-line react/jsx-no-bind
+                                onClick={() =>
+                                    column.toggleSorting(
+                                        column.getIsSorted() === 'asc'
+                                    )
+                                }
+                            >
+                                <div
+                                    className={clsx(
+                                        'flex flex-row items-center font-medium',
+                                        style?.text
+                                    )}
+                                    key={job.uid}
+                                >
+                                    <div
+                                        className={clsx(
+                                            'w-2 h-2 rounded mr-1.5',
+                                            style?.background
+                                        )}
+                                    ></div>
+                                    {job.status}
+                                </div>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                            className={'font-medium'}
+                            align={'end'}
+                        >
+                            <DropdownMenuLabel
+                                className={'text-muted-foreground'}
+                            >
+                                Mark as
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {status.map((status: StatusProps) => (
+                                <DropdownMenuItem
+                                    key={status.status}
+                                    onClick={setStatus(
+                                        job.uid,
+                                        status.status.trim()
+                                    )}
+                                >
+                                    <div
+                                        className={clsx(
+                                            'flex flex-row items-center font-medium',
+                                            status.text
+                                        )}
+                                        key={job.uid}
+                                    >
+                                        <div
+                                            className={clsx(
+                                                'w-2 h-2 rounded mr-1',
+                                                status.background
+                                            )}
+                                        ></div>
+                                        {status.status}
+                                    </div>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 </div>
             )
         },
@@ -133,6 +215,7 @@ export const columns: ColumnDef<Vacancy>[] = [
                             >
                                 Actions
                             </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
                             <DropdownMenuItem onClick={openUrl(job.url)}>
                                 Open Link
                             </DropdownMenuItem>
@@ -141,38 +224,6 @@ export const columns: ColumnDef<Vacancy>[] = [
                             >
                                 Copy link
                             </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuLabel
-                                className={'text-muted-foreground'}
-                            >
-                                Mark as
-                            </DropdownMenuLabel>
-                            {status.map((status: StatusProps) => (
-                                <DropdownMenuItem
-                                    key={status.status}
-                                    onClick={setStatus(
-                                        job.uid,
-                                        status.status.trim()
-                                    )}
-                                >
-                                    <div
-                                        className={clsx(
-                                            'flex flex-row items-center font-medium',
-                                            status.text
-                                        )}
-                                        key={job.description}
-                                    >
-                                        <div
-                                            className={clsx(
-                                                'w-2 h-2 rounded mr-1',
-                                                status.background
-                                            )}
-                                        ></div>
-                                        {status.status}
-                                    </div>
-                                </DropdownMenuItem>
-                            ))}
-                            <DropdownMenuSeparator />
                             <DropdownMenuItem
                                 onClick={del(job.uid)}
                                 className={'text-red-500 focus:text-red-500'}

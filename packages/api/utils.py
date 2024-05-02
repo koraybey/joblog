@@ -86,7 +86,7 @@ def scrape_from_linkedin(data: dict) -> LinkedInJobPost:  # type: ignore[return]
     else:
         url = _url.scheme + "://" + _url.netloc + _url.path
 
-    title = get_text(soup.find(["h1", "span"], class_=re.compile(f"(?:^|){TITLE_CLASS}(?:$|)")), "Job title")
+    title = get_text(soup.find("div", class_=re.compile(f"(?:^|){TITLE_CLASS}(?:$|)")), "Job title")
 
     # Location: City, Region, Country format (LinkedIn)
     location = get_text(soup.find("span", class_=re.compile(f"(?:^|){LOCATION_CLASS}(?:$|)")), "Job location")

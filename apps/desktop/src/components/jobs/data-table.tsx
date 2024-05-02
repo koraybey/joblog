@@ -1,11 +1,13 @@
 'use client'
 
-import type { ColumnDef } from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import {
     flexRender,
     getCoreRowModel,
+    getSortedRowModel,
     useReactTable,
 } from '@tanstack/react-table'
+import { useState } from 'react'
 
 import { Vacancy } from '@/__generated__/gql/graphql'
 import { useDetailStore } from '@/App'
@@ -29,10 +31,17 @@ export const DataTable = <TData, TValue>({
 }: DataTableProperties<TData, TValue>) => {
     const setVacancy = useDetailStore((state) => state.setVacancy)
 
+    const [sorting, setSorting] = useState<SortingState>([])
+
     const table = useReactTable({
         data,
         columns,
         getCoreRowModel: getCoreRowModel(),
+        onSortingChange: setSorting,
+        getSortedRowModel: getSortedRowModel(),
+        state: {
+            sorting,
+        },
     })
 
     return (
