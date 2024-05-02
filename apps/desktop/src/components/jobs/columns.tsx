@@ -93,11 +93,7 @@ export const columns: ColumnDef<Vacancy>[] = [
             // TODO Fix createdAt and updatedAt types on db
             // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             const date = formatDateRelative(job?.dateModified)
-            return (
-                <div className={'capitalize::first-letter mx-5 text-end'}>
-                    {date}
-                </div>
-            )
+            return <div className={'capitalize::first-letter mx-5'}>{date}</div>
         },
     },
     {
