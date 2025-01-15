@@ -1,4 +1,4 @@
-from markdownify import MarkdownConverter
+from markdownify import MarkdownConverter  # type: ignore[import-untyped]
 
 
 class UnconfiguredEnvironmentError(Exception):
@@ -6,10 +6,10 @@ class UnconfiguredEnvironmentError(Exception):
 
 
 # Markdown conversion helper functions.
-class AddBlanklineAfterStrong(MarkdownConverter):  # type: ignore[no-any-unimported]
+class AddBlanklineAfterStrong(MarkdownConverter):
     """Custom MarkdownConverter that adds a blank line after <strong> tag."""
 
-    def convert_strong(self, el, text, convert_as_inline):  # type: ignore[no-untyped-def]
+    def convert_strong(self, el, text, convert_as_inline):
         return super().convert_strong(el, text, convert_as_inline) + "\n\n"
 
 

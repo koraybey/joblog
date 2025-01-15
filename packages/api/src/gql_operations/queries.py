@@ -1,7 +1,7 @@
 
 from gql import gql
 
-from client import gql_client
+from .gql_client import gql_client
 
 
 def get_vacancy(uid: str) -> dict[str,str]:

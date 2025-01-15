@@ -3,7 +3,7 @@ import json
 import humps
 from gql import gql
 
-from client import gql_client
+from .gql_client import gql_client
 from models import LinkedInJobPost
 
 
