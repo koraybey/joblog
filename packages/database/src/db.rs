@@ -11,7 +11,7 @@ pub fn get_pool() -> PostgresPool {
     // TODO: pass the connection URL into this function rather than extracting
     // it from the environment within this function
     dotenv().ok();
-    let url = env::var("DATABASE_URL").expect("no DB URL"); // TODO: handle errors
+    let url = env::var("DATABASE_URL").expect("DATABASE_URL not set"); // TODO: handle errors
     let mgr = ConnectionManager::<PgConnection>::new(url);
     r2d2::Pool::builder()
         .build(mgr)

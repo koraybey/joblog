@@ -1,21 +1,6 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    analyses (pk) {
-        pk -> Int4,
-        uid -> Varchar,
-        company -> Varchar,
-        title -> Varchar,
-        #[sql_name = "match"]
-        match_ -> Varchar,
-        relevance -> Varchar,
-        reason -> Nullable<Text>,
-        date_created -> Nullable<Timestamp>,
-        date_modified -> Nullable<Timestamp>,
-    }
-}
-
-diesel::table! {
     vacancies (pk) {
         pk -> Int4,
         uid -> Varchar,
@@ -33,5 +18,3 @@ diesel::table! {
         contract_type -> Nullable<Varchar>,
     }
 }
-
-diesel::allow_tables_to_appear_in_same_query!(analyses, vacancies,);
