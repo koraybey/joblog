@@ -46,7 +46,6 @@ class LinkedInScraper:
     
     def scrape(self) -> LinkedInJobPost:
         job_details = self.get_job_details()
-        print(job_details)
         
         return LinkedInJobPost(
             company_logo=str(check_el_type(

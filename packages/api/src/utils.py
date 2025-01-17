@@ -3,5 +3,4 @@ from scraper.linkedin import LinkedInScraper
 
 def scrape_from_linkedin(data: dict) -> LinkedInJobPost:
     scraper = LinkedInScraper(data)
-    print(scraper)
     return scraper.scrape()
