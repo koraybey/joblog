@@ -2,6 +2,10 @@
 
 Joblog stores job vacancies from LinkedIn without manual data entry. Save listings for review and track your job search.
 
+
+> [!IMPORTANT]  
+> Joblog is not an automated scraper. It's a tool for job seekers to save jobs they're actively viewing and interested in.
+
 ## Features
 
 - **Job Capture**: Chrome extension saves LinkedIn job listings with keyboard shortcuts
