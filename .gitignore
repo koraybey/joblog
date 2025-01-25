@@ -2,13 +2,6 @@
 .vscode
 .DS_Store
 
-
-# folders
-local_models
-uploads
-chroma_db
-static
-
 # build
 .env
 .venv
