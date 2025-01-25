@@ -1,20 +1,34 @@
 {
   "name": "Joblog",
-  "version": "0.1",
+  "version": "1.0.0",
   "manifest_version": 3,
   "description": "Log the jobs for future analysis using the Joblog app.",
   "permissions": [
     "scripting",
     "tabs",
     "activeTab",
-    "declarativeContent"
+    "declarativeContent",
+    "commands"
   ],
   "host_permissions": [
     "https://*.linkedin.com/*"
   ],
   "action": {},
   "background": {
-    "service_worker": "background.js",
-    "type": "module"
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.linkedin.com/*"],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "commands": {
+    "create-vacancy": {
+      "suggested_key": {
+        "mac": "Command+Shift+0"
+      },
+      "description": "Create vacancy from current page"
+    }
   }
 }
